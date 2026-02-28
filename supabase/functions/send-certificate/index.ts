@@ -8,72 +8,60 @@ const corsHeaders = {
 interface CertificateRequest {
   name: string;
   email: string;
-  awardTitle: string;
+  awardTitle?: string;
   teamName?: string;
   eventDate?: string;
+  isGroup?: boolean;
+  businessName?: string;
+  tagline?: string;
 }
 
-const generateCertificateHtml = (name: string, awardTitle: string, teamName: string | undefined, eventDate: string) => `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    @page { size: A5 landscape; margin: 0; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      width: 210mm; height: 148mm;
-      background: #0a0a0f;
-      font-family: Georgia, 'Times New Roman', serif;
-      display: flex; align-items: center; justify-content: center;
-      color: #e0e0e0;
-    }
-    .cert {
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 20mm;
-      background: radial-gradient(ellipse at center, #12121a 0%, #0a0a0f 70%);
-    }
-    .logo { width: 48px; height: 48px; border-radius: 8px; margin-bottom: 16px; opacity: 0.9; }
-    .name {
-      font-size: 26px; font-weight: 700; margin-bottom: 12px;
-      background: linear-gradient(135deg, #d4a742, #f0d68a, #c49b30);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .divider { width: 60px; height: 1px; background: linear-gradient(90deg, transparent, #c49b30, transparent); margin: 0 auto 12px; }
-    .subtitle { font-size: 10px; text-transform: uppercase; letter-spacing: 3px; color: #a0a0a0; margin-bottom: 8px; font-family: Arial, sans-serif; }
-    .title {
-      font-size: 30px; font-weight: 700; letter-spacing: 4px; margin-bottom: 4px;
-      background: linear-gradient(135deg, #d4a742, #f0d68a, #c49b30);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .edition { font-size: 9px; text-transform: uppercase; letter-spacing: 2.5px; color: #707070; margin-bottom: 20px; font-family: Arial, sans-serif; }
-    .award { display: inline-block; padding: 8px 24px; border: 1px solid rgba(196,155,48,0.25); border-radius: 30px; margin-bottom: 16px; }
-    .award span { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #c49b30; font-weight: 600; font-family: Arial, sans-serif; }
-    .team { font-size: 11px; color: #707070; margin-bottom: 8px; font-family: Arial, sans-serif; }
-    .date { font-size: 9px; color: #505050; margin-bottom: 12px; font-family: Arial, sans-serif; }
-    .hashtag { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: #c49b30; margin-bottom: 6px; }
-    .copyright { font-size: 7px; color: #404050; font-family: Arial, sans-serif; }
-  </style>
-</head>
-<body>
-  <div class="cert">
-    <div class="name">${name}</div>
-    <div class="divider"></div>
-    <div class="subtitle">Official Member of</div>
-    <div class="title">THE ELITE CIRCLE</div>
-    <div class="edition">First Edition — The Lab by VION</div>
-    ${awardTitle ? `<div class="award"><span>${awardTitle}</span></div>` : ''}
-    ${teamName ? `<div class="team">${teamName}</div>` : ''}
-    <div class="date">${eventDate}</div>
-    <div class="hashtag">#VIONEVENTS</div>
-    <div class="copyright">© 2026 VION Events. All rights reserved.</div>
-  </div>
-</body>
-</html>`;
+const generateCertificateSvg = (name: string, label: string, sublabel: string | undefined, eventDate: string) => {
+  const escapeSvg = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const n = escapeSvg(name);
+  const l = escapeSvg(label);
+  const sl = sublabel ? escapeSvg(sublabel) : '';
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="874" height="614" viewBox="0 0 874 614">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#12121a"/>
+      <stop offset="100%" stop-color="#0a0a0f"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a742"/>
+      <stop offset="50%" stop-color="#f0d68a"/>
+      <stop offset="100%" stop-color="#c49b30"/>
+    </linearGradient>
+    <linearGradient id="divider" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="50%" stop-color="#c49b30"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+  <rect width="874" height="614" fill="url(#bg)"/>
+  <!-- Name -->
+  <text x="437" y="210" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700" fill="url(#gold)">${n}</text>
+  <!-- Divider -->
+  <rect x="407" y="228" width="60" height="1" fill="url(#divider)"/>
+  <!-- Official Member -->
+  <text x="437" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0a0a0" letter-spacing="3" text-transform="uppercase">OFFICIAL MEMBER OF</text>
+  <!-- Elite Circle -->
+  <text x="437" y="300" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" fill="url(#gold)" letter-spacing="4">THE ELITE CIRCLE</text>
+  <!-- Edition -->
+  <text x="437" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#707070" letter-spacing="2.5">FIRST EDITION — THE LAB BY VION</text>
+  <!-- Label (award or business name) -->
+  <rect x="${437 - (l.length * 4.5 + 28)}" y="345" width="${l.length * 9 + 56}" height="36" rx="18" fill="none" stroke="#c49b3040" stroke-width="1"/>
+  <text x="437" y="369" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#c49b30" font-weight="600" letter-spacing="2">${l.toUpperCase()}</text>
+  ${sl ? `<text x="437" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0" font-style="italic">"${sl}"</text>` : ''}
+  <!-- Date -->
+  <text x="437" y="${sl ? 435 : 420}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#505050">${escapeSvg(eventDate)}</text>
+  <!-- Hashtag -->
+  <text x="437" y="${sl ? 460 : 448}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="10" fill="#c49b30" font-weight="600" letter-spacing="1.5">#VIONEVENTS</text>
+  <!-- Copyright -->
+  <text x="437" y="${sl ? 480 : 468}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#404050">© 2026 VION Events. All rights reserved.</text>
+</svg>`;
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -86,92 +74,34 @@ serve(async (req) => {
       throw new Error('RESEND_API_KEY is not configured');
     }
 
-    const { name, email, awardTitle, teamName, eventDate = 'February 28, 2026' }: CertificateRequest = await req.json();
+    const { name, email, awardTitle, teamName, eventDate = 'February 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
 
-    if (!name || !email || !awardTitle) {
+    if (!name || !email) {
       return new Response(
-        JSON.stringify({ error: 'name, email, and awardTitle are required' }),
+        JSON.stringify({ error: 'name and email are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Generate A5 certificate HTML for attachment
-    const certificateHtml = generateCertificateHtml(name, awardTitle, teamName, eventDate);
-    const certificateBase64 = btoa(unescape(encodeURIComponent(certificateHtml)));
+    // Determine certificate label based on type
+    const certLabel = isGroup ? (businessName || '') : (awardTitle || '');
+    const certSublabel = isGroup ? (tagline || '') : undefined;
 
-    const emailHtml = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:'Helvetica Neue',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0f;padding:40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="500" cellpadding="0" cellspacing="0" style="background-color:#111118;border-radius:12px;border:1px solid #1a1a24;">
-          <tr>
-            <td style="padding:48px 40px;text-align:center;">
-              <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:#c49b30;margin:0 0 8px 0;font-weight:700;">
-                Welcome to The Elite Circle
-              </h1>
-              <p style="font-size:12px;color:#707070;text-transform:uppercase;letter-spacing:3px;margin:0 0 32px 0;">
-                The Lab by VION — First Edition
-              </p>
+    if (!certLabel) {
+      return new Response(
+        JSON.stringify({ error: isGroup ? 'businessName is required for group' : 'awardTitle is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-              <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 32px auto;"></div>
+    // Generate SVG certificate image
+    const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
+    const certificateBase64 = btoa(unescape(encodeURIComponent(certificateSvg)));
 
-              <p style="font-size:16px;color:#e0e0e0;line-height:1.6;margin:0 0 24px 0;">
-                Congratulations, <strong style="color:#c49b30;">${name}</strong>!
-              </p>
-
-              <p style="font-size:14px;color:#a0a0a0;line-height:1.8;margin:0 0 24px 0;">
-                You have been recognized as an official member of <strong style="color:#e0e0e0;">The Elite Circle</strong> for your outstanding achievement:
-              </p>
-
-              <div style="display:inline-block;padding:12px 28px;border:1px solid #c49b3040;border-radius:30px;margin:0 0 32px 0;">
-                <span style="font-size:14px;color:#c49b30;text-transform:uppercase;letter-spacing:2px;font-weight:600;">
-                  ${awardTitle}
-                </span>
-              </div>
-
-              ${teamName ? `
-              <p style="font-size:13px;color:#707070;margin:0 0 24px 0;">
-                Team: <strong style="color:#a0a0a0;">${teamName}</strong>
-              </p>
-              ` : ''}
-
-              <p style="font-size:13px;color:#707070;margin:0 0 24px 0;">
-                ${eventDate}
-              </p>
-
-              <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 24px auto;"></div>
-
-              <p style="font-size:13px;color:#a0a0a0;line-height:1.8;margin:0 0 8px 0;">
-                Your certificate is attached — download and share it!
-              </p>
-              <p style="font-size:13px;color:#a0a0a0;line-height:1.8;margin:0 0 8px 0;">
-                Share your achievement on social media!
-              </p>
-              <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 24px 0;">
-                <em>"Proud to be part of The Elite Circle 🏆 — ${awardTitle} at The Lab by VION #VIONEVENTS #TheLab #EliteCircle"</em>
-              </p>
-
-              <p style="font-size:11px;color:#c49b30;font-weight:600;letter-spacing:1.5px;margin:0 0 8px 0;">
-                #VIONEVENTS
-              </p>
-              <p style="font-size:11px;color:#404050;margin:24px 0 0 0;">
-                © 2026 VION Events. All rights reserved.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
+    // Build email HTML based on type
+    const emailHtml = isGroup
+      ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)
+      : buildIndividualEmailHtml(name, awardTitle!, teamName, eventDate);
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -182,13 +112,15 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'The Lab by VION <certificates@vionevents.com>',
         to: [email],
-        subject: 'Welcome to The Elite Circle — The Lab by VION',
+        subject: isGroup
+          ? `Welcome to The Elite Circle — ${businessName}`
+          : 'Welcome to The Elite Circle — The Lab by VION',
         html: emailHtml,
         attachments: [
           {
-            filename: `Elite-Circle-Certificate-${name.replace(/\s+/g, '-')}.html`,
+            filename: `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`,
             content: certificateBase64,
-            type: 'text/html',
+            type: 'image/svg+xml',
           },
         ],
       }),
@@ -213,3 +145,94 @@ serve(async (req) => {
     );
   }
 });
+
+function buildGroupEmailHtml(name: string, businessName: string, tagline: string, eventDate: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0f;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="500" cellpadding="0" cellspacing="0" style="background-color:#111118;border-radius:12px;border:1px solid #1a1a24;">
+        <tr><td style="padding:48px 40px;text-align:center;">
+          <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:#c49b30;margin:0 0 8px 0;font-weight:700;">
+            Welcome to The Elite Circle
+          </h1>
+          <p style="font-size:12px;color:#707070;text-transform:uppercase;letter-spacing:3px;margin:0 0 32px 0;">
+            The Lab by VION — First Edition
+          </p>
+          <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 32px auto;"></div>
+          <p style="font-size:16px;color:#e0e0e0;line-height:1.6;margin:0 0 24px 0;">
+            Congratulations, <strong style="color:#c49b30;">${name}</strong>!
+          </p>
+          <p style="font-size:14px;color:#a0a0a0;line-height:1.8;margin:0 0 24px 0;">
+            You have been recognized as an official member of <strong style="color:#e0e0e0;">The Elite Circle</strong>.
+          </p>
+          <div style="display:inline-block;padding:12px 28px;border:1px solid #c49b3040;border-radius:30px;margin:0 0 12px 0;">
+            <span style="font-size:14px;color:#c49b30;text-transform:uppercase;letter-spacing:2px;font-weight:600;">
+              ${businessName}
+            </span>
+          </div>
+          <p style="font-size:13px;color:#a0a0a0;font-style:italic;margin:0 0 24px 0;">
+            "${tagline}"
+          </p>
+          <p style="font-size:13px;color:#707070;margin:0 0 24px 0;">${eventDate}</p>
+          <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 24px auto;"></div>
+          <p style="font-size:13px;color:#a0a0a0;line-height:1.8;margin:0 0 8px 0;">
+            Your reward is attached — download and share your achievements on your social medias!
+          </p>
+          <p style="font-size:13px;color:#e0e0e0;font-weight:600;line-height:1.8;margin:0 0 24px 0;">
+            <em>"Proud to be part of The Elite Circle"</em>
+          </p>
+          <p style="font-size:11px;color:#c49b30;font-weight:600;letter-spacing:1.5px;margin:0 0 4px 0;">#VIONEVENTS #TheLab #EliteCircle</p>
+          <p style="font-size:11px;color:#404050;margin:24px 0 0 0;">© 2026 VION Events. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
+function buildIndividualEmailHtml(name: string, awardTitle: string, teamName: string | undefined, eventDate: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#0a0a0f;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0a0a0f;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="500" cellpadding="0" cellspacing="0" style="background-color:#111118;border-radius:12px;border:1px solid #1a1a24;">
+        <tr><td style="padding:48px 40px;text-align:center;">
+          <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:28px;color:#c49b30;margin:0 0 8px 0;font-weight:700;">
+            Welcome to The Elite Circle
+          </h1>
+          <p style="font-size:12px;color:#707070;text-transform:uppercase;letter-spacing:3px;margin:0 0 32px 0;">
+            The Lab by VION — First Edition
+          </p>
+          <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 32px auto;"></div>
+          <p style="font-size:16px;color:#e0e0e0;line-height:1.6;margin:0 0 24px 0;">
+            Congratulations, <strong style="color:#c49b30;">${name}</strong>!
+          </p>
+          <p style="font-size:14px;color:#a0a0a0;line-height:1.8;margin:0 0 24px 0;">
+            You have been recognized as an official member of <strong style="color:#e0e0e0;">The Elite Circle</strong> for your outstanding achievement:
+          </p>
+          <div style="display:inline-block;padding:12px 28px;border:1px solid #c49b3040;border-radius:30px;margin:0 0 32px 0;">
+            <span style="font-size:14px;color:#c49b30;text-transform:uppercase;letter-spacing:2px;font-weight:600;">${awardTitle}</span>
+          </div>
+          ${teamName ? `<p style="font-size:13px;color:#707070;margin:0 0 24px 0;">Team: <strong style="color:#a0a0a0;">${teamName}</strong></p>` : ''}
+          <p style="font-size:13px;color:#707070;margin:0 0 24px 0;">${eventDate}</p>
+          <div style="width:60px;height:1px;background:linear-gradient(90deg,transparent,#c49b30,transparent);margin:0 auto 24px auto;"></div>
+          <p style="font-size:13px;color:#a0a0a0;line-height:1.8;margin:0 0 8px 0;">Your certificate is attached — download and share it!</p>
+          <p style="font-size:13px;color:#a0a0a0;line-height:1.8;margin:0 0 8px 0;">Share your achievement on social media!</p>
+          <p style="font-size:12px;color:#707070;line-height:1.6;margin:0 0 24px 0;">
+            <em>"Proud to be part of The Elite Circle 🏆 — ${awardTitle} at The Lab by VION #VIONEVENTS #TheLab #EliteCircle"</em>
+          </p>
+          <p style="font-size:11px;color:#c49b30;font-weight:600;letter-spacing:1.5px;margin:0 0 8px 0;">#VIONEVENTS</p>
+          <p style="font-size:11px;color:#404050;margin:24px 0 0 0;">© 2026 VION Events. All rights reserved.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}

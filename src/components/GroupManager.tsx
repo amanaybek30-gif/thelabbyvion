@@ -16,8 +16,9 @@ const sendEliteCircleEmail = async (participant: { name: string; email: string }
     body: JSON.stringify({
       name: participant.name,
       email: participant.email,
-      awardTitle: group.businessName,
-      teamName: group.tagline,
+      isGroup: true,
+      businessName: group.businessName,
+      tagline: group.tagline,
     }),
   });
   const data = await res.json();

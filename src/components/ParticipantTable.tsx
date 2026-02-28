@@ -6,6 +6,24 @@ import { Search, Trophy, Trash2, Send, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+const SUPABASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'oerntmppsvicukdaadrt'}.supabase.co`;
+
+const sendCertificateEmail = async (participant: { name: string; email: string; awardTitle?: string; teamName: string }) => {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/send-certificate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: participant.name,
+      email: participant.email,
+      awardTitle: participant.awardTitle,
+      teamName: participant.teamName,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to send');
+  return data;
+};
+
 const AWARD_OPTIONS = [
   'Best Business Idea',
   'Most Innovative',
@@ -19,6 +37,7 @@ const ParticipantTable = () => {
   const { participants, searchQuery, setSearchQuery, toggleWinner, setAwardTitle, removeParticipant, markSent } =
     useAppStore();
   const [editingAward, setEditingAward] = useState<string | null>(null);
+  const [sending, setSending] = useState<Set<string>>(new Set());
 
   const filtered = participants.filter(
     (p) =>
@@ -29,17 +48,27 @@ const ParticipantTable = () => {
 
   const winners = participants.filter((p) => p.isWinner);
 
-  const handleGenerateAndSend = (id: string) => {
-    markSent(id);
-    toast.success('Certificate generated & sent!', {
-      description: 'Enable Lovable Cloud for actual email delivery',
-    });
+  const handleGenerateAndSend = async (id: string) => {
+    const p = participants.find((x) => x.id === id);
+    if (!p || !p.awardTitle) return;
+    setSending((s) => new Set(s).add(id));
+    try {
+      await sendCertificateEmail(p);
+      markSent(id);
+      toast.success(`Certificate sent to ${p.name}!`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to send: ${msg}`);
+    } finally {
+      setSending((s) => { const n = new Set(s); n.delete(id); return n; });
+    }
   };
 
-  const handleBulkSend = () => {
+  const handleBulkSend = async () => {
     const unsent = winners.filter((w) => w.status === 'pending' && w.awardTitle);
-    unsent.forEach((w) => markSent(w.id));
-    toast.success(`${unsent.length} certificates sent!`);
+    for (const w of unsent) {
+      await handleGenerateAndSend(w.id);
+    }
   };
 
   if (participants.length === 0) return null;
@@ -160,9 +189,14 @@ const ParticipantTable = () => {
                         <Button
                           size="sm"
                           onClick={() => handleGenerateAndSend(p.id)}
+                          disabled={sending.has(p.id)}
                           className="h-7 px-2 text-xs bg-success hover:bg-success/90"
                         >
-                          <Send className="w-3 h-3" />
+                          {sending.has(p.id) ? (
+                            <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Send className="w-3 h-3" />
+                          )}
                         </Button>
                       )}
                       <Button

@@ -6,6 +6,14 @@ export interface Participant {
   isWinner: boolean;
   awardTitle?: string;
   status: 'pending' | 'sent';
+  groupId?: string;
+}
+
+export interface Group {
+  id: string;
+  businessName: string;
+  tagline: string;
+  memberIds: string[];
 }
 
 export interface EventConfig {

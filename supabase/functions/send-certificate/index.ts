@@ -115,7 +115,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'The Lab by VION <onboarding@resend.dev>',
+        from: 'The Lab by VION <certificates@vionevents.com>',
         to: [email],
         subject: 'Welcome to The Elite Circle — The Lab by VION',
         html: emailHtml,

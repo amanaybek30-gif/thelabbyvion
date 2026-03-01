@@ -35,8 +35,8 @@ const CertificatePreview = ({ participant, eventDate = 'February 28, 2026' }: Pr
         backgroundColor: '#0a0a0f',
       });
       const link = document.createElement('a');
-      link.download = `Elite-Circle-${participant.name.replace(/\s+/g, '-')}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download = `Elite-Circle-${participant.name.replace(/\s+/g, '-')}.jpeg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
       link.click();
     } finally {
       a5Ref.current.style.display = 'none';

@@ -57,7 +57,7 @@ const LoginScreen = () => {
         </form>
 
         <p className="text-center text-muted-foreground text-xs mt-8 font-body">
-          Default password: <code className="text-gold">vionlab2026</code>
+          © 2026 VION Events. All rights reserved.
         </p>
       </div>
     </div>

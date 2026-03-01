@@ -14,6 +14,7 @@ export interface Group {
   businessName: string;
   tagline: string;
   memberIds: string[];
+  photoUrl?: string;
 }
 
 export interface EventConfig {

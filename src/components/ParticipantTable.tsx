@@ -2,9 +2,10 @@ import { useAppStore } from '@/lib/store';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Trophy, Trash2, Send, CheckCircle2 } from 'lucide-react';
+import { Search, Trophy, Trash2, Send, CheckCircle2, FileSpreadsheet } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 const SUPABASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'oerntmppsvicukdaadrt'}.supabase.co`;
 
@@ -71,6 +72,22 @@ const ParticipantTable = () => {
     }
   };
 
+  const handleExportExcel = () => {
+    const data = participants.map((p) => ({
+      Name: p.name,
+      Email: p.email,
+      Team: p.teamName || '',
+      Winner: p.isWinner ? 'Yes' : 'No',
+      Award: p.awardTitle || '',
+      Status: p.status,
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Participants');
+    XLSX.writeFile(wb, 'participants.xlsx');
+    toast.success('Exported to Excel!');
+  };
+
   if (participants.length === 0) return null;
 
   return (
@@ -94,6 +111,10 @@ const ParticipantTable = () => {
             <Trophy className="w-3 h-3 mr-1" />
             {winners.length} winners
           </Badge>
+          <Button size="sm" variant="outline" onClick={handleExportExcel} className="border-border font-body text-xs">
+            <FileSpreadsheet className="w-3 h-3 mr-1" />
+            Export Excel
+          </Button>
           {winners.filter((w) => w.status === 'pending' && w.awardTitle).length > 0 && (
             <Button size="sm" onClick={handleBulkSend} className="bg-gold-gradient font-body text-xs">
               <Send className="w-3 h-3 mr-1" />

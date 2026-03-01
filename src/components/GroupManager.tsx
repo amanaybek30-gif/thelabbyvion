@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, Users, Send, X, UserPlus } from 'lucide-react';
+import { Plus, Trash2, Users, Send, X, UserPlus, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const SUPABASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'oerntmppsvicukdaadrt'}.supabase.co`;
 
@@ -34,7 +35,9 @@ const GroupManager = () => {
   const [memberName, setMemberName] = useState('');
   const [memberEmail, setMemberEmail] = useState('');
   const [sending, setSending] = useState<Set<string>>(new Set());
+  const [uploading, setUploading] = useState<Set<string>>(new Set());
   const addParticipants = useAppStore((s) => s.addParticipants);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
   const handleCreateGroup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +81,41 @@ const GroupManager = () => {
     setMemberEmail('');
     setAddingMember(null);
     toast.success('Member added to group');
+  };
+
+  const handlePhotoUpload = async (groupId: string, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB');
+      return;
+    }
+
+    setUploading((s) => new Set(s).add(groupId));
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${groupId}/photo.${ext}`;
+
+      const { error } = await supabase.storage
+        .from('group-photos')
+        .upload(path, file, { upsert: true });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('group-photos')
+        .getPublicUrl(path);
+
+      updateGroup(groupId, { photoUrl: urlData.publicUrl });
+      toast.success('Group photo uploaded!');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Upload failed';
+      toast.error(msg);
+    } finally {
+      setUploading((s) => { const n = new Set(s); n.delete(groupId); return n; });
+    }
   };
 
   const handleSendToGroup = async (groupId: string) => {
@@ -135,14 +173,55 @@ const GroupManager = () => {
             const members = participants.filter((p) => group.memberIds.includes(p.id));
             const allSent = members.length > 0 && members.every((m) => m.status === 'sent');
             const pendingCount = members.filter((m) => m.status !== 'sent').length;
+            const isUploading = uploading.has(group.id);
 
             return (
               <div key={group.id} className="bg-card rounded-lg border border-border p-4 space-y-3">
                 {/* Group Header */}
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-display font-bold text-foreground truncate">{group.businessName}</h3>
-                    <p className="text-xs text-muted-foreground font-body italic mt-0.5">"{group.tagline}"</p>
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    {/* Group Photo */}
+                    <div className="shrink-0">
+                      {group.photoUrl ? (
+                        <div className="relative group/photo">
+                          <img
+                            src={group.photoUrl}
+                            alt={`${group.businessName} photo`}
+                            className="w-14 h-14 rounded-lg object-cover border border-border"
+                          />
+                          <button
+                            onClick={() => fileInputRefs.current[group.id]?.click()}
+                            className="absolute inset-0 bg-black/50 rounded-lg opacity-0 group-hover/photo:opacity-100 transition-opacity flex items-center justify-center"
+                          >
+                            <ImagePlus className="w-4 h-4 text-white" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => fileInputRefs.current[group.id]?.click()}
+                          disabled={isUploading}
+                          className="w-14 h-14 rounded-lg border border-dashed border-border bg-secondary/50 flex items-center justify-center hover:border-primary/50 transition-colors"
+                        >
+                          <ImagePlus className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        ref={(el) => { fileInputRefs.current[group.id] = el; }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handlePhotoUpload(group.id, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-sm font-display font-bold text-foreground truncate">{group.businessName}</h3>
+                      <p className="text-xs text-muted-foreground font-body italic mt-0.5">"{group.tagline}"</p>
+                      {isUploading && <p className="text-[10px] text-primary font-body mt-1">Uploading photo...</p>}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <Badge variant="outline" className="text-[10px] border-border font-body">

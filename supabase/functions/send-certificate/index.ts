@@ -40,28 +40,41 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     </linearGradient>
   </defs>
   <rect width="874" height="614" fill="url(#bg)"/>
-  <!-- Name -->
   <text x="437" y="210" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700" fill="url(#gold)">${n}</text>
-  <!-- Divider -->
   <rect x="407" y="228" width="60" height="1" fill="url(#divider)"/>
-  <!-- Official Member -->
-  <text x="437" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0a0a0" letter-spacing="3" text-transform="uppercase">OFFICIAL MEMBER OF</text>
-  <!-- Elite Circle -->
+  <text x="437" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0a0a0" letter-spacing="3">OFFICIAL MEMBER OF</text>
   <text x="437" y="300" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" fill="url(#gold)" letter-spacing="4">THE ELITE CIRCLE</text>
-  <!-- Edition -->
   <text x="437" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#707070" letter-spacing="2.5">FIRST EDITION — THE LAB BY VION</text>
-  <!-- Label (award or business name) -->
   <rect x="${437 - (l.length * 4.5 + 28)}" y="345" width="${l.length * 9 + 56}" height="36" rx="18" fill="none" stroke="#c49b3040" stroke-width="1"/>
   <text x="437" y="369" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#c49b30" font-weight="600" letter-spacing="2">${l.toUpperCase()}</text>
   ${sl ? `<text x="437" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0" font-style="italic">"${sl}"</text>` : ''}
-  <!-- Date -->
   <text x="437" y="${sl ? 435 : 420}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#505050">${escapeSvg(eventDate)}</text>
-  <!-- Hashtag -->
   <text x="437" y="${sl ? 460 : 448}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="10" fill="#c49b30" font-weight="600" letter-spacing="1.5">#VIONEVENTS</text>
-  <!-- Copyright -->
   <text x="437" y="${sl ? 480 : 468}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#404050">© 2026 VION Events. All rights reserved.</text>
 </svg>`;
 };
+
+// Convert SVG string to PNG using resvg-wasm
+async function svgToPng(svgString: string): Promise<Uint8Array> {
+  const { Resvg, initWasm } = await import("https://esm.sh/@aspect-dev/resvg-wasm@0.0.4");
+  
+  // Fetch and init WASM binary
+  const wasmResponse = await fetch("https://esm.sh/@aspect-dev/resvg-wasm@0.0.4/resvg.wasm");
+  const wasmBinary = await wasmResponse.arrayBuffer();
+  
+  try {
+    await initWasm(wasmBinary);
+  } catch (_e) {
+    // WASM may already be initialized
+  }
+  
+  const resvg = new Resvg(svgString, {
+    fitTo: { mode: 'width', value: 874 },
+  });
+  
+  const rendered = resvg.render();
+  return rendered.asPng();
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -83,7 +96,6 @@ serve(async (req) => {
       );
     }
 
-    // Determine certificate label based on type
     const certLabel = isGroup ? (businessName || '') : (awardTitle || '');
     const certSublabel = isGroup ? (tagline || '') : undefined;
 
@@ -94,11 +106,30 @@ serve(async (req) => {
       );
     }
 
-    // Generate SVG certificate image
+    // Generate SVG then convert to PNG
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
-    const certificateBase64 = btoa(unescape(encodeURIComponent(certificateSvg)));
+    
+    let attachmentContent: string;
+    let attachmentFilename: string;
+    let attachmentType: string;
 
-    // Build email HTML based on type
+    try {
+      const pngBytes = await svgToPng(certificateSvg);
+      // Convert Uint8Array to base64
+      let binary = '';
+      for (let i = 0; i < pngBytes.length; i++) {
+        binary += String.fromCharCode(pngBytes[i]);
+      }
+      attachmentContent = btoa(binary);
+      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
+      attachmentType = 'image/png';
+    } catch (pngError) {
+      console.error('PNG conversion failed, falling back to SVG:', pngError);
+      attachmentContent = btoa(unescape(encodeURIComponent(certificateSvg)));
+      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`;
+      attachmentType = 'image/svg+xml';
+    }
+
     const emailHtml = isGroup
       ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)
       : buildIndividualEmailHtml(name, awardTitle!, teamName, eventDate);
@@ -110,7 +141,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'The Lab by VION <certificates@vionevents.com>',
+        from: 'The Elite Circle <theelitecircle@vionevents.com>',
         to: [email],
         subject: isGroup
           ? `Welcome to The Elite Circle — ${businessName}`
@@ -118,9 +149,9 @@ serve(async (req) => {
         html: emailHtml,
         attachments: [
           {
-            filename: `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`,
-            content: certificateBase64,
-            type: 'image/svg+xml',
+            filename: attachmentFilename,
+            content: attachmentContent,
+            type: attachmentType,
           },
         ],
       }),

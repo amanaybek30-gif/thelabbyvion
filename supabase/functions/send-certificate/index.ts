@@ -22,58 +22,81 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   const l = escapeSvg(label);
   const sl = sublabel ? escapeSvg(sublabel) : '';
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="874" height="614" viewBox="0 0 874 614">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1748" height="1228" viewBox="0 0 1748 1228">
   <defs>
-    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
-      <stop offset="0%" stop-color="#12121a"/>
-      <stop offset="100%" stop-color="#0a0a0f"/>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0d12"/>
+      <stop offset="45%" stop-color="#101522"/>
+      <stop offset="100%" stop-color="#0b0d12"/>
+    </linearGradient>
+    <radialGradient id="glowTop" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#f3d88d" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#f3d88d" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d4a742"/>
-      <stop offset="50%" stop-color="#f0d68a"/>
-      <stop offset="100%" stop-color="#c49b30"/>
+      <stop offset="0%" stop-color="#f5df9f"/>
+      <stop offset="50%" stop-color="#d7ab46"/>
+      <stop offset="100%" stop-color="#b9892b"/>
     </linearGradient>
-    <linearGradient id="divider" x1="0%" y1="50%" x2="100%" y2="50%">
+    <linearGradient id="line" x1="0%" y1="50%" x2="100%" y2="50%">
       <stop offset="0%" stop-color="transparent"/>
-      <stop offset="50%" stop-color="#c49b30"/>
+      <stop offset="50%" stop-color="#d7ab46"/>
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="874" height="614" fill="url(#bg)"/>
-  <text x="437" y="210" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700" fill="url(#gold)">${n}</text>
-  <rect x="407" y="228" width="60" height="1" fill="url(#divider)"/>
-  <text x="437" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0a0a0" letter-spacing="3">OFFICIAL MEMBER OF</text>
-  <text x="437" y="300" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" fill="url(#gold)" letter-spacing="4">THE ELITE CIRCLE</text>
-  <text x="437" y="322" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#707070" letter-spacing="2.5">FIRST EDITION — THE LAB BY VION</text>
-  <rect x="${437 - (l.length * 4.5 + 28)}" y="345" width="${l.length * 9 + 56}" height="36" rx="18" fill="none" stroke="#c49b3040" stroke-width="1"/>
-  <text x="437" y="369" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#c49b30" font-weight="600" letter-spacing="2">${l.toUpperCase()}</text>
-  ${sl ? `<text x="437" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#a0a0a0" font-style="italic">"${sl}"</text>` : ''}
-  <text x="437" y="${sl ? 435 : 420}" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="#505050">${escapeSvg(eventDate)}</text>
-  <text x="437" y="${sl ? 460 : 448}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="10" fill="#c49b30" font-weight="600" letter-spacing="1.5">#VIONEVENTS</text>
-  <text x="437" y="${sl ? 480 : 468}" text-anchor="middle" font-family="Arial, sans-serif" font-size="7" fill="#404050">© 2026 VION Events. All rights reserved.</text>
+
+  <rect width="1748" height="1228" fill="url(#bg)"/>
+  <rect width="1748" height="1228" fill="url(#glowTop)"/>
+
+  <rect x="42" y="42" width="1664" height="1144" rx="24" fill="none" stroke="#8f6a24" stroke-opacity="0.35" stroke-width="2"/>
+  <rect x="64" y="64" width="1620" height="1100" rx="20" fill="none" stroke="url(#gold)" stroke-opacity="0.75" stroke-width="3"/>
+  <rect x="88" y="88" width="1572" height="1052" rx="18" fill="none" stroke="#f1d68d" stroke-opacity="0.18" stroke-width="1.5"/>
+
+  <g opacity="0.7" filter="url(#softGlow)">
+    <circle cx="130" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <circle cx="1618" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <circle cx="130" cy="1098" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <circle cx="1618" cy="1098" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
+  </g>
+
+  <g opacity="0.25">
+    <path d="M170 220 C260 190, 330 190, 420 220" stroke="url(#gold)" stroke-width="2" fill="none"/>
+    <path d="M1328 220 C1418 190, 1488 190, 1578 220" stroke="url(#gold)" stroke-width="2" fill="none"/>
+    <path d="M170 1008 C260 1038, 330 1038, 420 1008" stroke="url(#gold)" stroke-width="2" fill="none"/>
+    <path d="M1328 1008 C1418 1038, 1488 1038, 1578 1008" stroke="url(#gold)" stroke-width="2" fill="none"/>
+  </g>
+
+  <text x="874" y="285" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="78" font-weight="700" fill="url(#gold)">${n}</text>
+
+  <rect x="724" y="322" width="300" height="2" fill="url(#line)"/>
+
+  <text x="874" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" fill="#abb5c2" letter-spacing="8">OFFICIAL MEMBER OF</text>
+
+  <text x="874" y="490" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="700" fill="url(#gold)" letter-spacing="7">THE ELITE CIRCLE</text>
+
+  <text x="874" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#738096" letter-spacing="5">FIRST EDITION — THE LAB BY VION</text>
+
+  <rect x="${874 - (l.length * 9 + 110)}" y="612" width="${l.length * 18 + 220}" height="86" rx="43" fill="#0e1320" fill-opacity="0.75" stroke="#d7ab46" stroke-opacity="0.35" stroke-width="2"/>
+
+  <text x="874" y="668" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" fill="url(#gold)" font-weight="700" letter-spacing="3">${l.toUpperCase()}</text>
+
+  ${sl ? `<text x="874" y="760" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="30" fill="#c8ced8" font-style="italic">“${sl}”</text>` : ''}
+
+  <rect x="674" y="${sl ? 806 : 768}" width="400" height="2" fill="url(#line)" opacity="0.8"/>
+  <text x="874" y="${sl ? 862 : 824}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#8b95a6">Issued on ${escapeSvg(eventDate)}</text>
 </svg>`;
 };
 
-// Convert SVG string to PNG using resvg-wasm
 async function svgToPng(svgString: string): Promise<Uint8Array> {
-  const { Resvg, initWasm } = await import("https://esm.sh/@aspect-dev/resvg-wasm@0.0.4");
-  
-  // Fetch and init WASM binary
-  const wasmResponse = await fetch("https://esm.sh/@aspect-dev/resvg-wasm@0.0.4/resvg.wasm");
-  const wasmBinary = await wasmResponse.arrayBuffer();
-  
-  try {
-    await initWasm(wasmBinary);
-  } catch (_e) {
-    // WASM may already be initialized
-  }
-  
-  const resvg = new Resvg(svgString, {
-    fitTo: { mode: 'width', value: 874 },
-  });
-  
-  const rendered = resvg.render();
-  return rendered.asPng();
+  const { render } = await import("https://deno.land/x/resvg_wasm@0.3.0/mod.ts");
+  return await render(svgString);
 }
 
 serve(async (req) => {
@@ -109,26 +132,16 @@ serve(async (req) => {
     // Generate SVG then convert to PNG
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
     
-    let attachmentContent: string;
-    let attachmentFilename: string;
-    let attachmentType: string;
+    const pngBytes = await svgToPng(certificateSvg);
 
-    try {
-      const pngBytes = await svgToPng(certificateSvg);
-      // Convert Uint8Array to base64
-      let binary = '';
-      for (let i = 0; i < pngBytes.length; i++) {
-        binary += String.fromCharCode(pngBytes[i]);
-      }
-      attachmentContent = btoa(binary);
-      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
-      attachmentType = 'image/png';
-    } catch (pngError) {
-      console.error('PNG conversion failed, falling back to SVG:', pngError);
-      attachmentContent = btoa(unescape(encodeURIComponent(certificateSvg)));
-      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`;
-      attachmentType = 'image/svg+xml';
+    let binary = '';
+    for (let i = 0; i < pngBytes.length; i++) {
+      binary += String.fromCharCode(pngBytes[i]);
     }
+
+    const attachmentContent = btoa(binary);
+    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
+    const attachmentType = 'image/png';
 
     const emailHtml = isGroup
       ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)

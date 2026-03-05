@@ -128,7 +128,7 @@ serve(async (req) => {
 
     // Generate SVG then convert to PNG attachment
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
-    const pngBytes = svgToPng(certificateSvg);
+    const pngBytes = await svgToPng(certificateSvg);
 
     let binary = '';
     for (let i = 0; i < pngBytes.length; i++) {

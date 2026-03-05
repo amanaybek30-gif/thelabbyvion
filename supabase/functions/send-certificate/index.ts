@@ -94,10 +94,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
 </svg>`;
 };
 
-async function svgToPng(svgString: string): Promise<Uint8Array> {
-  const { render } = await import("https://deno.land/x/resvg_wasm@0.3.0/mod.ts");
-  return await render(svgString);
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

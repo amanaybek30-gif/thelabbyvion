@@ -94,12 +94,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
 </svg>`;
 };
 function svgToPng(svgString: string): Uint8Array {
-  const svgBytes = new TextEncoder().encode(svgString);
-
-  return ImageMagick.read(svgBytes, (img): Uint8Array => {
-    img.resize(1748, 1228);
-    return img.write(MagickFormat.Png, (data) => data);
-  });
+  return render(svgString);
 }
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

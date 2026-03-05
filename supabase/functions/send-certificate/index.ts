@@ -99,7 +99,14 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
 </svg>`;
 };
 function svgToPng(svgString: string): Uint8Array {
-  return render(svgString);
+  const resvg = new Resvg(svgString, {
+    fitTo: {
+      mode: "width",
+      value: 1748,
+    },
+  });
+
+  return resvg.render().asPng();
 }
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

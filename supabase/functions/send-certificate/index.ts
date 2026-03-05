@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
+import { render as renderSvgToPng } from "https://deno.land/x/resvg_wasm@0.2.0/mod.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
@@ -43,13 +43,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
       <stop offset="50%" stop-color="#d7ab46"/>
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
-    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
 
   <rect width="1748" height="1228" fill="url(#bg)"/>
@@ -59,7 +52,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="64" y="64" width="1620" height="1100" rx="20" fill="none" stroke="url(#gold)" stroke-opacity="0.75" stroke-width="3"/>
   <rect x="88" y="88" width="1572" height="1052" rx="18" fill="none" stroke="#f1d68d" stroke-opacity="0.18" stroke-width="1.5"/>
 
-  <g opacity="0.7" filter="url(#softGlow)">
+  <g opacity="0.55">
     <circle cx="130" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <circle cx="1618" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <circle cx="130" cy="1098" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
@@ -81,7 +74,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
 
   <text x="874" y="490" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="700" fill="url(#gold)" letter-spacing="7">THE ELITE CIRCLE</text>
 
-  <text x="874" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#738096" letter-spacing="5">FIRST EDITION — THE LAB BY VION</text>
+  <text x="874" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#738096" letter-spacing="5">ELEGANCE • EXCELLENCE • IMPACT</text>
 
   <rect x="${874 - (l.length * 9 + 110)}" y="612" width="${l.length * 18 + 220}" height="86" rx="43" fill="#0e1320" fill-opacity="0.75" stroke="#d7ab46" stroke-opacity="0.35" stroke-width="2"/>
 
@@ -93,8 +86,9 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <text x="874" y="${sl ? 862 : 824}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#8b95a6">Issued on ${escapeSvg(eventDate)}</text>
 </svg>`;
 };
-
-
+async function svgToPng(svgString: string): Promise<Uint8Array> {
+  return await renderSvgToPng(svgString);
+}
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -125,19 +119,18 @@ serve(async (req) => {
       );
     }
 
-    // Generate SVG certificate
+    // Generate SVG then convert to PNG attachment
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
-    
-    // Encode SVG as base64 for attachment
-    const encoder = new TextEncoder();
-    const svgBytes = encoder.encode(certificateSvg);
+    const pngBytes = await svgToPng(certificateSvg);
+
     let binary = '';
-    for (let i = 0; i < svgBytes.length; i++) {
-      binary += String.fromCharCode(svgBytes[i]);
+    for (let i = 0; i < pngBytes.length; i++) {
+      binary += String.fromCharCode(pngBytes[i]);
     }
+
     const attachmentContent = btoa(binary);
-    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`;
-    const attachmentType = 'image/svg+xml';
+    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
+    const attachmentType = 'image/png';
 
     const emailHtml = isGroup
       ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)

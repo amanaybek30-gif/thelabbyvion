@@ -43,13 +43,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
       <stop offset="50%" stop-color="#d7ab46"/>
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
-    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
   </defs>
 
   <rect width="1748" height="1228" fill="url(#bg)"/>

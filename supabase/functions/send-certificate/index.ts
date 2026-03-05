@@ -132,26 +132,16 @@ serve(async (req) => {
     // Generate SVG then convert to PNG
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
     
-    let attachmentContent: string;
-    let attachmentFilename: string;
-    let attachmentType: string;
+    const pngBytes = await svgToPng(certificateSvg);
 
-    try {
-      const pngBytes = await svgToPng(certificateSvg);
-      // Convert Uint8Array to base64
-      let binary = '';
-      for (let i = 0; i < pngBytes.length; i++) {
-        binary += String.fromCharCode(pngBytes[i]);
-      }
-      attachmentContent = btoa(binary);
-      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
-      attachmentType = 'image/png';
-    } catch (pngError) {
-      console.error('PNG conversion failed, falling back to SVG:', pngError);
-      attachmentContent = btoa(unescape(encodeURIComponent(certificateSvg)));
-      attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`;
-      attachmentType = 'image/svg+xml';
+    let binary = '';
+    for (let i = 0; i < pngBytes.length; i++) {
+      binary += String.fromCharCode(pngBytes[i]);
     }
+
+    const attachmentContent = btoa(binary);
+    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
+    const attachmentType = 'image/png';
 
     const emailHtml = isGroup
       ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)

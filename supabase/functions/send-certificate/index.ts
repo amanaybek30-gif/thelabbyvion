@@ -125,19 +125,19 @@ serve(async (req) => {
       );
     }
 
-    // Generate SVG then convert to PNG
+    // Generate SVG certificate
     const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
     
-    const pngBytes = await svgToPng(certificateSvg);
-
+    // Encode SVG as base64 for attachment
+    const encoder = new TextEncoder();
+    const svgBytes = encoder.encode(certificateSvg);
     let binary = '';
-    for (let i = 0; i < pngBytes.length; i++) {
-      binary += String.fromCharCode(pngBytes[i]);
+    for (let i = 0; i < svgBytes.length; i++) {
+      binary += String.fromCharCode(svgBytes[i]);
     }
-
     const attachmentContent = btoa(binary);
-    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.png`;
-    const attachmentType = 'image/png';
+    const attachmentFilename = `Elite-Circle-${name.replace(/\s+/g, '-')}.svg`;
+    const attachmentType = 'image/svg+xml';
 
     const emailHtml = isGroup
       ? buildGroupEmailHtml(name, businessName!, tagline!, eventDate)

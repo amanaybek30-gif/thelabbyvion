@@ -93,15 +93,8 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <text x="874" y="${sl ? 862 : 824}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#8b95a6">Issued on ${escapeSvg(eventDate)}</text>
 </svg>`;
 };
-function svgToPng(svgString: string): Uint8Array {
-  const resvg = new Resvg(svgString, {
-    fitTo: {
-      mode: "width",
-      value: 1748,
-    },
-  });
-
-  return resvg.render().asPng();
+async function svgToPng(svgString: string): Promise<Uint8Array> {
+  return await renderSvgToPng(svgString);
 }
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

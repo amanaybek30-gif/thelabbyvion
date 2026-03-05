@@ -52,7 +52,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="64" y="64" width="1620" height="1100" rx="20" fill="none" stroke="url(#gold)" stroke-opacity="0.75" stroke-width="3"/>
   <rect x="88" y="88" width="1572" height="1052" rx="18" fill="none" stroke="#f1d68d" stroke-opacity="0.18" stroke-width="1.5"/>
 
-  <g opacity="0.7" filter="url(#softGlow)">
+  <g opacity="0.55">
     <circle cx="130" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <circle cx="1618" cy="130" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <circle cx="130" cy="1098" r="20" fill="none" stroke="url(#gold)" stroke-width="2"/>

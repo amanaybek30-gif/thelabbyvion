@@ -93,7 +93,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
 
   <text x="874" y="490" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="700" fill="url(#gold)" letter-spacing="7">THE ELITE CIRCLE</text>
 
-  <text x="874" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#738096" letter-spacing="5">FIRST EDITION — THE LAB BY VION</text>
+  <text x="874" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#738096" letter-spacing="5">ELEGANCE • EXCELLENCE • IMPACT</text>
 
   <rect x="${874 - (l.length * 9 + 110)}" y="612" width="${l.length * 18 + 220}" height="86" rx="43" fill="#0e1320" fill-opacity="0.75" stroke="#d7ab46" stroke-opacity="0.35" stroke-width="2"/>
 

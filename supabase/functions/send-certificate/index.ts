@@ -105,8 +105,14 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <text x="874" y="${sl ? 862 : 824}" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#8b95a6">Issued on ${escapeSvg(eventDate)}</text>
 </svg>`;
 };
+function svgToPng(svgString: string): Uint8Array {
+  const svgBytes = new TextEncoder().encode(svgString);
 
-
+  return ImageMagick.read(svgBytes, (img): Uint8Array => {
+    img.resize(1748, 1228);
+    return img.write(MagickFormat.Png, (data) => data);
+  });
+}
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

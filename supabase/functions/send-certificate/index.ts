@@ -177,7 +177,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <text x="874" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="700" fill="url(#gold)" letter-spacing="6">THE ELITE CIRCLE</text>
 
   <!-- Tagline -->
-  <text x="874" y="650" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#5a6580" letter-spacing="6">ELEGANCE • EXCELLENCE • IMPACT</text>
+  <text x="874" y="650" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#9aa5be" letter-spacing="6">ELEGANCE • EXCELLENCE • IMPACT</text>
 
   <!-- Decorative separator -->
   <g opacity="0.6" transform="translate(874,690)">

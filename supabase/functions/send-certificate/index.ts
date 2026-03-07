@@ -150,7 +150,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   </g>
 
   <!-- Certificate of Membership heading -->
-  <text x="874" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#8b95a6" letter-spacing="10" text-decoration="none">CERTIFICATE OF MEMBERSHIP</text>
+  <text x="874" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#c8cfe0" letter-spacing="10" text-decoration="none">CERTIFICATE OF MEMBERSHIP</text>
 
   <!-- Decorative line under heading -->
   <rect x="574" y="282" width="600" height="1.5" fill="url(#line)"/>

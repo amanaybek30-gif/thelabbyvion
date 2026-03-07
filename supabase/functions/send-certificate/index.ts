@@ -223,7 +223,7 @@ serve(async (req) => {
       throw new Error('RESEND_API_KEY is not configured');
     }
 
-    const { name, email, awardTitle, teamName, eventDate = 'February 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
+    const { name, email, awardTitle, teamName, eventDate = 'March 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
 
     if (!name || !email) {
       return new Response(

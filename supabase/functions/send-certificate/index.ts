@@ -156,7 +156,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="574" y="282" width="600" height="1.5" fill="url(#line)"/>
 
   <!-- Presented to -->
-  <text x="874" y="340" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#6b7590" letter-spacing="6">PRESENTED TO</text>
+  <text x="874" y="340" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#b0bcd0" letter-spacing="6">PRESENTED TO</text>
 
   <!-- Recipient name -->
   <text x="874" y="420" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="url(#goldShine)">${n}</text>

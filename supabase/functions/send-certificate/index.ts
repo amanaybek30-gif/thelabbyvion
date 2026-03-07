@@ -193,7 +193,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="${874 - (l.length * 8 + 76)}" y="724" width="${l.length * 16 + 152}" height="62" rx="31" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1"/>
   <text x="874" y="766" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="url(#gold)" font-weight="700" letter-spacing="3">${l.toUpperCase()}</text>
 
-  ${sl ? `<text x="874" y="850" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#b0b8c8" font-style="italic">"${sl}"</text>` : ''}
+  ${sl ? `<text x="874" y="850" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#c8cfe0" font-style="italic">"${sl}"</text>` : ''}
 
   <!-- Bottom section -->
   <rect x="674" y="${sl ? 895 : 840}" width="400" height="1.5" fill="url(#line)" opacity="0.6"/>

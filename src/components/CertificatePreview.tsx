@@ -15,7 +15,7 @@ interface Props {
 const A5_WIDTH = 874;
 const A5_HEIGHT = 614;
 
-const CertificatePreview = ({ participant, eventDate = 'February 28, 2026' }: Props) => {
+const CertificatePreview = ({ participant, eventDate = 'March 28, 2026' }: Props) => {
   const certRef = useRef<HTMLDivElement>(null);
   const a5Ref = useRef<HTMLDivElement>(null);
 

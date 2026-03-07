@@ -150,13 +150,13 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   </g>
 
   <!-- Certificate of Membership heading -->
-  <text x="874" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#8b95a6" letter-spacing="10" text-decoration="none">CERTIFICATE OF MEMBERSHIP</text>
+  <text x="874" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#c8cfe0" letter-spacing="10" text-decoration="none">CERTIFICATE OF MEMBERSHIP</text>
 
   <!-- Decorative line under heading -->
   <rect x="574" y="282" width="600" height="1.5" fill="url(#line)"/>
 
   <!-- Presented to -->
-  <text x="874" y="340" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#6b7590" letter-spacing="6">PRESENTED TO</text>
+  <text x="874" y="340" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#b0bcd0" letter-spacing="6">PRESENTED TO</text>
 
   <!-- Recipient name -->
   <text x="874" y="420" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="url(#goldShine)">${n}</text>
@@ -171,13 +171,13 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   </g>
 
   <!-- Official member text -->
-  <text x="874" y="510" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#8b95a6" letter-spacing="8">OFFICIAL MEMBER OF</text>
+  <text x="874" y="510" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#c8cfe0" letter-spacing="8">OFFICIAL MEMBER OF</text>
 
   <!-- The Elite Circle -->
   <text x="874" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="700" fill="url(#gold)" letter-spacing="6">THE ELITE CIRCLE</text>
 
   <!-- Tagline -->
-  <text x="874" y="650" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#5a6580" letter-spacing="6">ELEGANCE • EXCELLENCE • IMPACT</text>
+  <text x="874" y="650" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#9aa5be" letter-spacing="6">ELEGANCE • EXCELLENCE • IMPACT</text>
 
   <!-- Decorative separator -->
   <g opacity="0.6" transform="translate(874,690)">
@@ -193,13 +193,13 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="${874 - (l.length * 8 + 76)}" y="724" width="${l.length * 16 + 152}" height="62" rx="31" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1"/>
   <text x="874" y="766" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="url(#gold)" font-weight="700" letter-spacing="3">${l.toUpperCase()}</text>
 
-  ${sl ? `<text x="874" y="850" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#b0b8c8" font-style="italic">"${sl}"</text>` : ''}
+  ${sl ? `<text x="874" y="850" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#c8cfe0" font-style="italic">"${sl}"</text>` : ''}
 
   <!-- Bottom section -->
   <rect x="674" y="${sl ? 895 : 840}" width="400" height="1.5" fill="url(#line)" opacity="0.6"/>
 
   <!-- Date -->
-  <text x="874" y="${sl ? 945 : 895}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#6b7590" letter-spacing="3">Issued on ${escapeSvg(eventDate)}</text>
+  <text x="874" y="${sl ? 945 : 895}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#b0bcd0" letter-spacing="3">Issued on ${escapeSvg(eventDate)}</text>
 
   <!-- Bottom decorative stars -->
   <g opacity="0.25" transform="translate(874, ${sl ? 990 : 945})">
@@ -223,7 +223,7 @@ serve(async (req) => {
       throw new Error('RESEND_API_KEY is not configured');
     }
 
-    const { name, email, awardTitle, teamName, eventDate = 'February 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
+    const { name, email, awardTitle, teamName, eventDate = 'March 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
 
     if (!name || !email) {
       return new Response(

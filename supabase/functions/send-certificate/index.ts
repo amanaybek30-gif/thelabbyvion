@@ -25,49 +25,72 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1748" height="1228" viewBox="0 0 1748 1228">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#060810"/>
-      <stop offset="30%" stop-color="#0d1220"/>
-      <stop offset="60%" stop-color="#10162a"/>
-      <stop offset="100%" stop-color="#060810"/>
+      <stop offset="0%" stop-color="#050810"/>
+      <stop offset="30%" stop-color="#0a0f1e"/>
+      <stop offset="60%" stop-color="#0e1428"/>
+      <stop offset="100%" stop-color="#050810"/>
     </linearGradient>
-    <radialGradient id="glowCenter" cx="50%" cy="40%" r="50%">
-      <stop offset="0%" stop-color="#d7ab46" stop-opacity="0.08"/>
+    <radialGradient id="glowCenter" cx="50%" cy="45%" r="45%">
+      <stop offset="0%" stop-color="#d7ab46" stop-opacity="0.1"/>
+      <stop offset="60%" stop-color="#d7ab46" stop-opacity="0.03"/>
       <stop offset="100%" stop-color="#d7ab46" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glowTop" cx="50%" cy="0%" r="60%">
-      <stop offset="0%" stop-color="#f3d88d" stop-opacity="0.12"/>
+    <radialGradient id="glowTop" cx="50%" cy="0%" r="55%">
+      <stop offset="0%" stop-color="#f3d88d" stop-opacity="0.14"/>
       <stop offset="100%" stop-color="#f3d88d" stop-opacity="0"/>
     </radialGradient>
-    <radialGradient id="glowBottom" cx="50%" cy="100%" r="60%">
-      <stop offset="0%" stop-color="#b9892b" stop-opacity="0.06"/>
+    <radialGradient id="glowBottom" cx="50%" cy="100%" r="55%">
+      <stop offset="0%" stop-color="#b9892b" stop-opacity="0.08"/>
       <stop offset="100%" stop-color="#b9892b" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f5e6b8"/>
-      <stop offset="25%" stop-color="#f3d88d"/>
+      <stop offset="0%" stop-color="#fcedc4"/>
+      <stop offset="20%" stop-color="#f3d88d"/>
       <stop offset="50%" stop-color="#d7ab46"/>
-      <stop offset="75%" stop-color="#c49b30"/>
+      <stop offset="80%" stop-color="#c49b30"/>
       <stop offset="100%" stop-color="#b9892b"/>
     </linearGradient>
     <linearGradient id="goldShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff5d6"/>
+      <stop offset="30%" stop-color="#f3d88d"/>
+      <stop offset="70%" stop-color="#d7ab46"/>
+      <stop offset="100%" stop-color="#9a7520"/>
+    </linearGradient>
+    <linearGradient id="goldHoriz" x1="0%" y1="50%" x2="100%" y2="50%">
       <stop offset="0%" stop-color="#fcedc4"/>
       <stop offset="50%" stop-color="#d7ab46"/>
-      <stop offset="100%" stop-color="#9a7520"/>
+      <stop offset="100%" stop-color="#fcedc4"/>
     </linearGradient>
     <linearGradient id="line" x1="0%" y1="50%" x2="100%" y2="50%">
       <stop offset="0%" stop-color="transparent"/>
-      <stop offset="30%" stop-color="#d7ab4680"/>
+      <stop offset="20%" stop-color="#d7ab4650"/>
       <stop offset="50%" stop-color="#f3d88d"/>
-      <stop offset="70%" stop-color="#d7ab4680"/>
+      <stop offset="80%" stop-color="#d7ab4650"/>
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
-    <linearGradient id="lineShort" x1="0%" y1="50%" x2="100%" y2="50%">
+    <linearGradient id="lineFade" x1="0%" y1="50%" x2="100%" y2="50%">
       <stop offset="0%" stop-color="transparent"/>
-      <stop offset="50%" stop-color="#d7ab4660"/>
+      <stop offset="30%" stop-color="#d7ab4640"/>
+      <stop offset="50%" stop-color="#d7ab4680"/>
+      <stop offset="70%" stop-color="#d7ab4640"/>
       <stop offset="100%" stop-color="transparent"/>
     </linearGradient>
-    <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-      <circle cx="20" cy="20" r="0.8" fill="#d7ab46" opacity="0.12"/>
+    <linearGradient id="sideGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="30%" stop-color="#d7ab4630"/>
+      <stop offset="50%" stop-color="#d7ab4660"/>
+      <stop offset="70%" stop-color="#d7ab4630"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    <pattern id="dots" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
+      <circle cx="18" cy="18" r="0.6" fill="#d7ab46" opacity="0.1"/>
+    </pattern>
+    <pattern id="filigree" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <circle cx="40" cy="40" r="0.4" fill="#d7ab46" opacity="0.06"/>
+      <circle cx="0" cy="0" r="0.4" fill="#d7ab46" opacity="0.06"/>
+      <circle cx="80" cy="0" r="0.4" fill="#d7ab46" opacity="0.06"/>
+      <circle cx="0" cy="80" r="0.4" fill="#d7ab46" opacity="0.06"/>
+      <circle cx="80" cy="80" r="0.4" fill="#d7ab46" opacity="0.06"/>
     </pattern>
     <clipPath id="innerClip">
       <rect x="64" y="64" width="1620" height="1100" rx="16"/>
@@ -80,132 +103,163 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect width="1748" height="1228" fill="url(#glowTop)"/>
   <rect width="1748" height="1228" fill="url(#glowBottom)"/>
   <rect width="1748" height="1228" fill="url(#dots)"/>
+  <rect width="1748" height="1228" fill="url(#filigree)"/>
 
   <!-- Outer triple border -->
-  <rect x="30" y="30" width="1688" height="1168" rx="20" fill="none" stroke="#8f6a24" stroke-opacity="0.2" stroke-width="1"/>
-  <rect x="48" y="48" width="1652" height="1132" rx="18" fill="none" stroke="url(#gold)" stroke-opacity="0.5" stroke-width="2"/>
-  <rect x="64" y="64" width="1620" height="1100" rx="16" fill="none" stroke="url(#gold)" stroke-opacity="0.85" stroke-width="3"/>
+  <rect x="24" y="24" width="1700" height="1180" rx="22" fill="none" stroke="#8f6a24" stroke-opacity="0.15" stroke-width="1"/>
+  <rect x="40" y="40" width="1668" height="1148" rx="20" fill="none" stroke="url(#gold)" stroke-opacity="0.4" stroke-width="1.5"/>
+  <rect x="56" y="56" width="1636" height="1116" rx="18" fill="none" stroke="url(#gold)" stroke-opacity="0.8" stroke-width="2.5"/>
+  <rect x="72" y="72" width="1604" height="1084" rx="14" fill="none" stroke="url(#gold)" stroke-opacity="0.3" stroke-width="1"/>
 
-  <!-- Inner decorative border -->
-  <rect x="90" y="90" width="1568" height="1048" rx="12" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1" stroke-dasharray="8,6"/>
+  <!-- Inner decorative border with dash -->
+  <rect x="96" y="96" width="1556" height="1036" rx="10" fill="none" stroke="#d7ab46" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="12,8"/>
 
   <!-- Corner ornaments - top left -->
-  <g opacity="0.6" transform="translate(100,100)">
-    <path d="M0 60 L0 0 L60 0" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-    <path d="M10 50 L10 10 L50 10" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="4" fill="#d7ab46"/>
-    <path d="M0 0 Q30 15 60 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
-    <path d="M0 0 Q15 30 0 60" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
+  <g opacity="0.7" transform="translate(96,96)">
+    <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="5" fill="#d7ab46"/>
+    <circle cx="0" cy="0" r="2" fill="#fcedc4"/>
+    <path d="M0 0 Q40 18 80 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
   <!-- Corner ornaments - top right -->
-  <g opacity="0.6" transform="translate(1648,100) scale(-1,1)">
-    <path d="M0 60 L0 0 L60 0" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-    <path d="M10 50 L10 10 L50 10" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="4" fill="#d7ab46"/>
-    <path d="M0 0 Q30 15 60 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
-    <path d="M0 0 Q15 30 0 60" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
+  <g opacity="0.7" transform="translate(1652,96) scale(-1,1)">
+    <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="5" fill="#d7ab46"/>
+    <circle cx="0" cy="0" r="2" fill="#fcedc4"/>
+    <path d="M0 0 Q40 18 80 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
   <!-- Corner ornaments - bottom left -->
-  <g opacity="0.6" transform="translate(100,1128) scale(1,-1)">
-    <path d="M0 60 L0 0 L60 0" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-    <path d="M10 50 L10 10 L50 10" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="4" fill="#d7ab46"/>
-    <path d="M0 0 Q30 15 60 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
-    <path d="M0 0 Q15 30 0 60" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
+  <g opacity="0.7" transform="translate(96,1132) scale(1,-1)">
+    <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="5" fill="#d7ab46"/>
+    <circle cx="0" cy="0" r="2" fill="#fcedc4"/>
+    <path d="M0 0 Q40 18 80 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
   <!-- Corner ornaments - bottom right -->
-  <g opacity="0.6" transform="translate(1648,1128) scale(-1,-1)">
-    <path d="M0 60 L0 0 L60 0" fill="none" stroke="url(#gold)" stroke-width="2.5"/>
-    <path d="M10 50 L10 10 L50 10" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="4" fill="#d7ab46"/>
-    <path d="M0 0 Q30 15 60 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
-    <path d="M0 0 Q15 30 0 60" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.3"/>
+  <g opacity="0.7" transform="translate(1652,1132) scale(-1,-1)">
+    <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="5" fill="#d7ab46"/>
+    <circle cx="0" cy="0" r="2" fill="#fcedc4"/>
+    <path d="M0 0 Q40 18 80 0" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
+    <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
 
   <!-- Top center ornamental flourish -->
-  <g opacity="0.5" transform="translate(874,140)">
-    <path d="M-120 0 Q-80 -25 -40 0 Q0 25 40 0 Q80 -25 120 0" fill="none" stroke="url(#gold)" stroke-width="1.8"/>
-    <path d="M-80 0 Q-40 -15 0 0 Q40 15 80 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="3" fill="#f3d88d"/>
-    <circle cx="-120" cy="0" r="2" fill="#d7ab46"/>
-    <circle cx="120" cy="0" r="2" fill="#d7ab46"/>
+  <g opacity="0.6" transform="translate(874,145)">
+    <path d="M-160 0 Q-120 -30 -80 0 Q-40 30 0 0 Q40 -30 80 0 Q120 30 160 0" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <path d="M-100 0 Q-50 -18 0 0 Q50 18 100 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="4" fill="#fcedc4"/>
+    <circle cx="-160" cy="0" r="2.5" fill="#d7ab46"/>
+    <circle cx="160" cy="0" r="2.5" fill="#d7ab46"/>
+    <path d="M-8 0 L0 -8 L8 0 L0 8 Z" fill="none" stroke="#f3d88d" stroke-width="1" stroke-opacity="0.5"/>
   </g>
 
   <!-- Bottom center ornamental flourish -->
-  <g opacity="0.5" transform="translate(874,1088)">
-    <path d="M-120 0 Q-80 25 -40 0 Q0 -25 40 0 Q80 25 120 0" fill="none" stroke="url(#gold)" stroke-width="1.8"/>
-    <path d="M-80 0 Q-40 15 0 0 Q40 -15 80 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.5"/>
-    <circle cx="0" cy="0" r="3" fill="#f3d88d"/>
-    <circle cx="-120" cy="0" r="2" fill="#d7ab46"/>
-    <circle cx="120" cy="0" r="2" fill="#d7ab46"/>
+  <g opacity="0.6" transform="translate(874,1085)">
+    <path d="M-160 0 Q-120 30 -80 0 Q-40 -30 0 0 Q40 30 80 0 Q120 -30 160 0" fill="none" stroke="url(#gold)" stroke-width="2"/>
+    <path d="M-100 0 Q-50 18 0 0 Q50 -18 100 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.4"/>
+    <circle cx="0" cy="0" r="4" fill="#fcedc4"/>
+    <circle cx="-160" cy="0" r="2.5" fill="#d7ab46"/>
+    <circle cx="160" cy="0" r="2.5" fill="#d7ab46"/>
+    <path d="M-8 0 L0 -8 L8 0 L0 8 Z" fill="none" stroke="#f3d88d" stroke-width="1" stroke-opacity="0.5"/>
   </g>
 
   <!-- Side decorative lines -->
-  <rect x="120" y="400" width="1.5" height="428" fill="url(#lineShort)" opacity="0.4" transform="rotate(0)"/>
-  <rect x="1626" y="400" width="1.5" height="428" fill="url(#lineShort)" opacity="0.4"/>
+  <rect x="115" y="350" width="2" height="528" fill="url(#sideGlow)"/>
+  <rect x="1631" y="350" width="2" height="528" fill="url(#sideGlow)"/>
+
+  <!-- Side small diamond accents -->
+  <g opacity="0.3">
+    <path d="M116 340 L120 334 L124 340 L120 346 Z" fill="#d7ab46"/>
+    <path d="M116 888 L120 882 L124 888 L120 894 Z" fill="#d7ab46"/>
+    <path d="M1628 340 L1632 334 L1636 340 L1632 346 Z" fill="#d7ab46"/>
+    <path d="M1628 888 L1632 882 L1636 888 L1632 894 Z" fill="#d7ab46"/>
+  </g>
 
   <!-- Star/diamond accent top -->
-  <g opacity="0.35" transform="translate(874, 195)">
-    <path d="M0 -12 L3 -3 L12 0 L3 3 L0 12 L-3 3 L-12 0 L-3 -3 Z" fill="#f3d88d"/>
+  <g opacity="0.5" transform="translate(874, 200)">
+    <path d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z" fill="#f3d88d"/>
+    <path d="M0 -10 L2.5 -2.5 L10 0 L2.5 2.5 L0 10 L-2.5 2.5 L-10 0 L-2.5 -2.5 Z" fill="#fcedc4" opacity="0.6"/>
   </g>
 
   <!-- Certificate of Membership heading -->
-  <text x="874" y="260" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#c8cfe0" letter-spacing="10" text-decoration="none">CERTIFICATE OF MEMBERSHIP</text>
+  <text x="874" y="268" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#FFFFFF" letter-spacing="12" font-weight="400">CERTIFICATE OF MEMBERSHIP</text>
 
   <!-- Decorative line under heading -->
-  <rect x="574" y="282" width="600" height="1.5" fill="url(#line)"/>
+  <rect x="524" y="292" width="700" height="2" fill="url(#line)"/>
+  <rect x="574" y="298" width="600" height="1" fill="url(#lineFade)" opacity="0.5"/>
+
+  <!-- Small ornament under line -->
+  <g opacity="0.5" transform="translate(874,305)">
+    <path d="M-6 0 L0 -6 L6 0 L0 6 Z" fill="#d7ab46"/>
+  </g>
 
   <!-- Presented to -->
-  <text x="874" y="340" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#b0bcd0" letter-spacing="6">PRESENTED TO</text>
+  <text x="874" y="365" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#FFFFFF" letter-spacing="8" opacity="0.85">PRESENTED TO</text>
 
   <!-- Recipient name -->
-  <text x="874" y="420" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="url(#goldShine)">${n}</text>
+  <text x="874" y="455" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="76" font-weight="700" fill="url(#goldShine)">${n}</text>
 
   <!-- Decorative line under name -->
-  <rect x="524" y="448" width="700" height="2" fill="url(#line)"/>
-  
+  <rect x="474" y="480" width="800" height="2.5" fill="url(#line)"/>
+  <rect x="524" y="487" width="700" height="1" fill="url(#lineFade)" opacity="0.4"/>
+
   <!-- Small diamonds flanking the line -->
-  <g opacity="0.5">
-    <path d="M504 448 L514 443 L524 448 L514 453 Z" fill="#d7ab46"/>
-    <path d="M1224 448 L1234 443 L1244 448 L1234 453 Z" fill="#d7ab46"/>
+  <g opacity="0.6">
+    <path d="M454 480 L466 474 L478 480 L466 486 Z" fill="#d7ab46"/>
+    <path d="M1270 480 L1282 474 L1294 480 L1282 486 Z" fill="#d7ab46"/>
   </g>
 
   <!-- Official member text -->
-  <text x="874" y="510" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#c8cfe0" letter-spacing="8">OFFICIAL MEMBER OF</text>
+  <text x="874" y="545" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#FFFFFF" letter-spacing="10" font-weight="400">OFFICIAL MEMBER OF</text>
 
   <!-- The Elite Circle -->
-  <text x="874" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="700" fill="url(#gold)" letter-spacing="6">THE ELITE CIRCLE</text>
+  <text x="874" y="640" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="84" font-weight="700" fill="url(#gold)" letter-spacing="5">THE ELITE CIRCLE</text>
 
   <!-- Tagline -->
-  <text x="874" y="650" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#9aa5be" letter-spacing="6">ELEGANCE • EXCELLENCE • IMPACT</text>
+  <text x="874" y="695" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#FFFFFF" letter-spacing="8" opacity="0.7">ELEGANCE  •  EXCELLENCE  •  IMPACT</text>
 
-  <!-- Decorative separator -->
-  <g opacity="0.6" transform="translate(874,690)">
-    <rect x="-200" y="-0.75" width="400" height="1.5" fill="url(#line)"/>
-    <circle cx="0" cy="0" r="4" fill="none" stroke="#d7ab46" stroke-width="1.5"/>
-    <circle cx="0" cy="0" r="1.5" fill="#f3d88d"/>
-    <circle cx="-210" cy="0" r="2" fill="#d7ab46" opacity="0.5"/>
-    <circle cx="210" cy="0" r="2" fill="#d7ab46" opacity="0.5"/>
+  <!-- Decorative separator with ornate center -->
+  <g opacity="0.7" transform="translate(874,740)">
+    <rect x="-250" y="-1" width="500" height="2" fill="url(#line)"/>
+    <circle cx="0" cy="0" r="6" fill="none" stroke="url(#goldHoriz)" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="2.5" fill="#fcedc4"/>
+    <path d="M-14 0 L0 -14 L14 0 L0 14 Z" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.4"/>
+    <circle cx="-260" cy="0" r="2.5" fill="#d7ab46" opacity="0.5"/>
+    <circle cx="260" cy="0" r="2.5" fill="#d7ab46" opacity="0.5"/>
   </g>
 
   <!-- Award/Business label in ornate pill -->
-  <rect x="${874 - (l.length * 8 + 80)}" y="720" width="${l.length * 16 + 160}" height="70" rx="35" fill="#0a0f1a" fill-opacity="0.8" stroke="url(#gold)" stroke-opacity="0.5" stroke-width="1.5"/>
-  <rect x="${874 - (l.length * 8 + 76)}" y="724" width="${l.length * 16 + 152}" height="62" rx="31" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1"/>
-  <text x="874" y="766" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="url(#gold)" font-weight="700" letter-spacing="3">${l.toUpperCase()}</text>
+  <rect x="${874 - (l.length * 8 + 90)}" y="770" width="${l.length * 16 + 180}" height="74" rx="37" fill="#080c18" fill-opacity="0.85" stroke="url(#gold)" stroke-opacity="0.6" stroke-width="2"/>
+  <rect x="${874 - (l.length * 8 + 85)}" y="775" width="${l.length * 16 + 170}" height="64" rx="32" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1"/>
+  <text x="874" y="818" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="url(#gold)" font-weight="700" letter-spacing="4">${l.toUpperCase()}</text>
 
-  ${sl ? `<text x="874" y="850" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#c8cfe0" font-style="italic">"${sl}"</text>` : ''}
+  ${sl ? `<text x="874" y="900" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#FFFFFF" font-style="italic" opacity="0.9">"${sl}"</text>` : ''}
 
   <!-- Bottom section -->
-  <rect x="674" y="${sl ? 895 : 840}" width="400" height="1.5" fill="url(#line)" opacity="0.6"/>
+  <rect x="624" y="${sl ? 940 : 885}" width="500" height="1.5" fill="url(#line)" opacity="0.6"/>
 
   <!-- Date -->
-  <text x="874" y="${sl ? 945 : 895}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#b0bcd0" letter-spacing="3">Issued on ${escapeSvg(eventDate)}</text>
+  <text x="874" y="${sl ? 985 : 935}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#FFFFFF" letter-spacing="4" opacity="0.85">Issued on ${escapeSvg(eventDate)}</text>
 
   <!-- Bottom decorative stars -->
-  <g opacity="0.25" transform="translate(874, ${sl ? 990 : 945})">
-    <path d="M-30 0 L-27 -3 L-24 0 L-27 3 Z" fill="#d7ab46"/>
-    <path d="M0 0 L3 -4 L6 0 L3 4 Z" fill="#f3d88d"/>
-    <path d="M24 0 L27 -3 L30 0 L27 3 Z" fill="#d7ab46"/>
+  <g opacity="0.4" transform="translate(874, ${sl ? 1025 : 975})">
+    <path d="M-40 0 L-36 -4 L-32 0 L-36 4 Z" fill="#d7ab46"/>
+    <path d="M0 0 L4 -6 L8 0 L4 6 Z" fill="#fcedc4"/>
+    <path d="M32 0 L36 -4 L40 0 L36 4 Z" fill="#d7ab46"/>
+    <path d="M-20 0 L-18 -2 L-16 0 L-18 2 Z" fill="#d7ab46" opacity="0.5"/>
+    <path d="M16 0 L18 -2 L20 0 L18 2 Z" fill="#d7ab46" opacity="0.5"/>
   </g>
 </svg>`;
 };

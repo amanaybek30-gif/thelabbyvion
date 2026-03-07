@@ -171,7 +171,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   </g>
 
   <!-- Official member text -->
-  <text x="874" y="510" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#8b95a6" letter-spacing="8">OFFICIAL MEMBER OF</text>
+  <text x="874" y="510" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#c8cfe0" letter-spacing="8">OFFICIAL MEMBER OF</text>
 
   <!-- The Elite Circle -->
   <text x="874" y="600" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="80" font-weight="700" fill="url(#gold)" letter-spacing="6">THE ELITE CIRCLE</text>

@@ -199,7 +199,7 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   <rect x="674" y="${sl ? 895 : 840}" width="400" height="1.5" fill="url(#line)" opacity="0.6"/>
 
   <!-- Date -->
-  <text x="874" y="${sl ? 945 : 895}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#6b7590" letter-spacing="3">Issued on ${escapeSvg(eventDate)}</text>
+  <text x="874" y="${sl ? 945 : 895}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#b0bcd0" letter-spacing="3">Issued on ${escapeSvg(eventDate)}</text>
 
   <!-- Bottom decorative stars -->
   <g opacity="0.25" transform="translate(874, ${sl ? 990 : 945})">

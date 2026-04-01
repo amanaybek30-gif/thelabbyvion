@@ -13,7 +13,7 @@ const LoginScreen = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'vionlab2026') {
+    if (password === '0105Aman@aybek') {
       setAuthenticated(true);
     } else {
       setError('Invalid password');

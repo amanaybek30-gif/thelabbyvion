@@ -6,7 +6,6 @@ import { Search, Trophy, Trash2, Send, CheckCircle2, FileSpreadsheet } from 'luc
 import { useState } from 'react';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
-import { dbUpdateParticipant, dbDeleteParticipant } from '@/hooks/useRealtimeSync';
 
 const SUPABASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'oerntmppsvicukdaadrt'}.supabase.co`;
 

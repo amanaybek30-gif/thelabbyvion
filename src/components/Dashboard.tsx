@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { LogOut, Eye, Users, Trophy, Layers } from 'lucide-react';
 
 const Dashboard = () => {
+  useRealtimeSync();
   const { participants, groups, setAuthenticated } = useAppStore();
   const [previewId, setPreviewId] = useState<string | null>(null);
   const winners = participants.filter((p) => p.isWinner);

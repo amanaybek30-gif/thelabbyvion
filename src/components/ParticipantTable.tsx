@@ -56,7 +56,6 @@ const ParticipantTable = () => {
     try {
       await sendCertificateEmail(p);
       markSent(id);
-      dbUpdateParticipant(id, { status: 'sent' });
       toast.success(`Certificate sent to ${p.name}!`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown error';

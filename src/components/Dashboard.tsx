@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
+import { useRealtimeSync } from '@/hooks/useRealtimeSync';
 import CSVUpload from './CSVUpload';
 import ParticipantTable from './ParticipantTable';
 import AddParticipantForm from './AddParticipantForm';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { LogOut, Eye, Users, Trophy, Layers } from 'lucide-react';
 
 const Dashboard = () => {
+  useRealtimeSync();
   const { participants, groups, setAuthenticated } = useAppStore();
   const [previewId, setPreviewId] = useState<string | null>(null);
   const winners = participants.filter((p) => p.isWinner);

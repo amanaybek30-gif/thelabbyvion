@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      groups: {
+        Row: {
+          business_name: string
+          created_at: string
+          id: string
+          member_ids: string[]
+          photo_url: string | null
+          tagline: string
+        }
+        Insert: {
+          business_name: string
+          created_at?: string
+          id: string
+          member_ids?: string[]
+          photo_url?: string | null
+          tagline: string
+        }
+        Update: {
+          business_name?: string
+          created_at?: string
+          id?: string
+          member_ids?: string[]
+          photo_url?: string | null
+          tagline?: string
+        }
+        Relationships: []
+      }
+      participants: {
+        Row: {
+          award_title: string | null
+          created_at: string
+          email: string
+          group_id: string | null
+          id: string
+          is_winner: boolean
+          name: string
+          status: string
+          team_name: string
+        }
+        Insert: {
+          award_title?: string | null
+          created_at?: string
+          email: string
+          group_id?: string | null
+          id: string
+          is_winner?: boolean
+          name: string
+          status?: string
+          team_name?: string
+        }
+        Update: {
+          award_title?: string | null
+          created_at?: string
+          email?: string
+          group_id?: string | null
+          id?: string
+          is_winner?: boolean
+          name?: string
+          status?: string
+          team_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

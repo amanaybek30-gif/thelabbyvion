@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAppStore } from '@/lib/store';
 import { Participant, Group } from '@/lib/types';
+import { toast } from 'sonner';
 
 // Maps DB row to app Participant
 const toParticipant = (row: any): Participant => ({
@@ -46,71 +47,104 @@ const toGroupRow = (g: Group) => ({
 });
 
 export const useRealtimeSync = () => {
-  const initialLoadDone = useRef(false);
-  const skipNextUpdate = useRef(false);
+  const syncDone = useRef(false);
 
   useEffect(() => {
-    const loadInitial = async () => {
+    if (syncDone.current) return;
+    syncDone.current = true;
+
+    const loadAndSync = async () => {
+      // Fetch DB data
       const [{ data: pData }, { data: gData }] = await Promise.all([
         supabase.from('participants').select('*').order('created_at'),
         supabase.from('groups').select('*').order('created_at'),
       ]);
 
-      if (pData) {
-        useAppStore.getState().setParticipants(pData.map(toParticipant));
+      const dbParticipants = (pData || []).map(toParticipant);
+      const dbGroups = (gData || []).map(toGroup);
+
+      // Get local data (persisted via localStorage)
+      const localParticipants = useAppStore.getState().participants;
+      const localGroups = useAppStore.getState().groups;
+
+      if (dbParticipants.length > 0 || dbGroups.length > 0) {
+        // DB has data — use it as source of truth, merge any local-only items
+        const dbPIds = new Set(dbParticipants.map((p) => p.id));
+        const dbGIds = new Set(dbGroups.map((g) => g.id));
+
+        const localOnlyP = localParticipants.filter((p) => !dbPIds.has(p.id));
+        const localOnlyG = localGroups.filter((g) => !dbGIds.has(g.id));
+
+        // Push local-only data to DB
+        if (localOnlyP.length > 0) {
+          await supabase.from('participants').upsert(localOnlyP.map(toParticipantRow) as any);
+        }
+        if (localOnlyG.length > 0) {
+          await supabase.from('groups').upsert(localOnlyG.map(toGroupRow) as any);
+        }
+
+        // Set merged state
+        useAppStore.getState().setParticipants([...dbParticipants, ...localOnlyP]);
+        useAppStore.setState({ groups: [...dbGroups, ...localOnlyG] });
+      } else if (localParticipants.length > 0 || localGroups.length > 0) {
+        // DB is empty but local has data — push everything to DB
+        console.log(`Syncing ${localParticipants.length} participants and ${localGroups.length} groups to cloud...`);
+
+        if (localParticipants.length > 0) {
+          const { error: pErr } = await supabase
+            .from('participants')
+            .upsert(localParticipants.map(toParticipantRow) as any);
+          if (pErr) console.error('Failed to sync participants:', pErr);
+        }
+        if (localGroups.length > 0) {
+          const { error: gErr } = await supabase
+            .from('groups')
+            .upsert(localGroups.map(toGroupRow) as any);
+          if (gErr) console.error('Failed to sync groups:', gErr);
+        }
+
+        toast.success(`Synced ${localParticipants.length} participants and ${localGroups.length} groups to cloud`);
       }
-      if (gData) {
-        useAppStore.setState({ groups: gData.map(toGroup) });
-      }
-      initialLoadDone.current = true;
     };
 
-    loadInitial();
+    loadAndSync();
 
     // Realtime subscription
     const channel = supabase
       .channel('sync-all')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'participants' }, (payload) => {
-        if (skipNextUpdate.current) {
-          skipNextUpdate.current = false;
-          return;
-        }
         const store = useAppStore.getState();
         if (payload.eventType === 'INSERT') {
           const newP = toParticipant(payload.new);
-          if (!store.participants.find(p => p.id === newP.id)) {
+          if (!store.participants.find((p) => p.id === newP.id)) {
             useAppStore.setState({ participants: [...store.participants, newP] });
           }
         } else if (payload.eventType === 'UPDATE') {
           const updated = toParticipant(payload.new);
           useAppStore.setState({
-            participants: store.participants.map(p => p.id === updated.id ? updated : p),
+            participants: store.participants.map((p) => (p.id === updated.id ? updated : p)),
           });
         } else if (payload.eventType === 'DELETE') {
           useAppStore.setState({
-            participants: store.participants.filter(p => p.id !== (payload.old as any).id),
+            participants: store.participants.filter((p) => p.id !== (payload.old as any).id),
           });
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'groups' }, (payload) => {
-        if (skipNextUpdate.current) {
-          skipNextUpdate.current = false;
-          return;
-        }
         const store = useAppStore.getState();
         if (payload.eventType === 'INSERT') {
           const newG = toGroup(payload.new);
-          if (!store.groups.find(g => g.id === newG.id)) {
+          if (!store.groups.find((g) => g.id === newG.id)) {
             useAppStore.setState({ groups: [...store.groups, newG] });
           }
         } else if (payload.eventType === 'UPDATE') {
           const updated = toGroup(payload.new);
           useAppStore.setState({
-            groups: store.groups.map(g => g.id === updated.id ? updated : g),
+            groups: store.groups.map((g) => (g.id === updated.id ? updated : g)),
           });
         } else if (payload.eventType === 'DELETE') {
           useAppStore.setState({
-            groups: store.groups.filter(g => g.id !== (payload.old as any).id),
+            groups: store.groups.filter((g) => g.id !== (payload.old as any).id),
           });
         }
       })

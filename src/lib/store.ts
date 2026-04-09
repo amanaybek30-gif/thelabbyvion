@@ -164,6 +164,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         participants: state.participants,
         groups: state.groups,
+        certificateTemplateUrl: state.certificateTemplateUrl,
       }),
     }
   )

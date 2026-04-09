@@ -7,6 +7,8 @@ interface AppState {
   groups: Group[];
   isAuthenticated: boolean;
   searchQuery: string;
+  certificateTemplateUrl: string | null;
+  setCertificateTemplateUrl: (url: string | null) => void;
   setParticipants: (p: Participant[]) => void;
   addParticipants: (p: Participant[]) => void;
   updateParticipant: (id: string, data: Partial<Participant>) => void;
@@ -33,6 +35,8 @@ export const useAppStore = create<AppState>()(
       groups: [],
       isAuthenticated: false,
       searchQuery: '',
+      certificateTemplateUrl: null,
+      setCertificateTemplateUrl: (url) => set({ certificateTemplateUrl: url }),
       setParticipants: (participants) => set({ participants }),
       addParticipants: (newP) => {
         set((s) => ({ participants: [...s.participants, ...newP] }));
@@ -160,6 +164,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         participants: state.participants,
         groups: state.groups,
+        certificateTemplateUrl: state.certificateTemplateUrl,
       }),
     }
   )

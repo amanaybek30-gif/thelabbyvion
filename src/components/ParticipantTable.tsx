@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx';
 
 const SUPABASE_URL = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID || 'oerntmppsvicukdaadrt'}.supabase.co`;
 
-const sendCertificateEmail = async (participant: { name: string; email: string; awardTitle?: string; teamName: string }) => {
+const sendCertificateEmail = async (participant: { name: string; email: string; awardTitle?: string; teamName: string }, certificateTemplateUrl?: string | null) => {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/send-certificate`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -18,6 +18,7 @@ const sendCertificateEmail = async (participant: { name: string; email: string; 
       email: participant.email,
       awardTitle: participant.awardTitle,
       teamName: participant.teamName,
+      certificateTemplateUrl: certificateTemplateUrl || undefined,
     }),
   });
   const data = await res.json();
@@ -35,7 +36,7 @@ const AWARD_OPTIONS = [
 ];
 
 const ParticipantTable = () => {
-  const { participants, searchQuery, setSearchQuery, toggleWinner, setAwardTitle, removeParticipant, markSent } =
+  const { participants, searchQuery, setSearchQuery, toggleWinner, setAwardTitle, removeParticipant, markSent, certificateTemplateUrl } =
     useAppStore();
   const [editingAward, setEditingAward] = useState<string | null>(null);
   const [sending, setSending] = useState<Set<string>>(new Set());
@@ -54,7 +55,7 @@ const ParticipantTable = () => {
     if (!p || !p.awardTitle) return;
     setSending((s) => new Set(s).add(id));
     try {
-      await sendCertificateEmail(p);
+      await sendCertificateEmail(p, certificateTemplateUrl);
       markSent(id);
       toast.success(`Certificate sent to ${p.name}!`);
     } catch (err: unknown) {

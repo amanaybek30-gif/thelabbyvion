@@ -21,4 +21,5 @@ export interface EventConfig {
   eventName: string;
   eventDate: string;
   edition: string;
+  certificateTemplateUrl?: string;
 }

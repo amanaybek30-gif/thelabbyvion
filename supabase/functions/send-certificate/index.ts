@@ -78,14 +78,15 @@ function generateOverlaySvg(imageDataUri: string, imgWidth: number, imgHeight: n
   const escapeSvg = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const n = escapeSvg(name);
 
-  // Name position: centered, at 42% from top (typical position for name on certificates)
-  const nameY = Math.round(imgHeight * 0.42);
+  // Name position: centered, at 48% from top — sits right on the underline below "Presented To"
+  // dominant-baseline="auto" so the text baseline aligns with the line
+  const nameY = Math.round(imgHeight * 0.48);
   // Font size scales with image width
   const fontSize = Math.round(imgWidth * 0.04);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${imgWidth}" height="${imgHeight}" viewBox="0 0 ${imgWidth} ${imgHeight}">
   <image href="${imageDataUri}" x="0" y="0" width="${imgWidth}" height="${imgHeight}"/>
-  <text x="${imgWidth / 2}" y="${nameY}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" font-weight="700" fill="#1a1a2e" letter-spacing="2">${n}</text>
+  <text x="${imgWidth / 2}" y="${nameY}" text-anchor="middle" dominant-baseline="auto" font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" font-weight="700" fill="#1a1a2e" letter-spacing="2">${n}</text>
 </svg>`;
 }
 

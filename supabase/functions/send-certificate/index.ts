@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { render as renderSvgToPng } from "https://deno.land/x/resvg_wasm@0.2.0/mod.ts";
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
@@ -14,7 +15,81 @@ interface CertificateRequest {
   isGroup?: boolean;
   businessName?: string;
   tagline?: string;
+  certificateTemplateUrl?: string;
 }
+
+/**
+ * Fetches an image and returns it as a base64 data URI.
+ */
+async function fetchImageAsBase64(url: string): Promise<{ dataUri: string; width: number; height: number }> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch template image: ${res.status}`);
+  const arrayBuf = await res.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuf);
+
+  // Detect content type
+  const contentType = res.headers.get('content-type') || 'image/png';
+
+  // Convert to base64
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const b64 = btoa(binary);
+  const dataUri = `data:${contentType};base64,${b64}`;
+
+  // Try to detect image dimensions from the binary data
+  let width = 1748;
+  let height = 1228;
+
+  // PNG: width at bytes 16-19, height at bytes 20-23
+  if (bytes[0] === 0x89 && bytes[1] === 0x50) {
+    width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+    height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+  }
+  // JPEG: search for SOF0 marker
+  else if (bytes[0] === 0xFF && bytes[1] === 0xD8) {
+    let offset = 2;
+    while (offset < bytes.length - 9) {
+      if (bytes[offset] === 0xFF) {
+        const marker = bytes[offset + 1];
+        if (marker >= 0xC0 && marker <= 0xCF && marker !== 0xC4 && marker !== 0xC8 && marker !== 0xCC) {
+          height = (bytes[offset + 5] << 8) | bytes[offset + 6];
+          width = (bytes[offset + 7] << 8) | bytes[offset + 8];
+          break;
+        }
+        const segLen = (bytes[offset + 2] << 8) | bytes[offset + 3];
+        offset += 2 + segLen;
+      } else {
+        offset++;
+      }
+    }
+  }
+
+  return { dataUri, width, height };
+}
+
+/**
+ * Generate an SVG that overlays the winner's name on an uploaded certificate template.
+ * The name is placed centered horizontally, at ~38% from the top (right on top of the underline,
+ * below the "Presented To" text that's typically at ~32%).
+ */
+function generateOverlaySvg(imageDataUri: string, imgWidth: number, imgHeight: number, name: string): string {
+  const escapeSvg = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const n = escapeSvg(name);
+
+  // Name position: centered, at 42% from top (typical position for name on certificates)
+  const nameY = Math.round(imgHeight * 0.42);
+  // Font size scales with image width
+  const fontSize = Math.round(imgWidth * 0.04);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${imgWidth}" height="${imgHeight}" viewBox="0 0 ${imgWidth} ${imgHeight}">
+  <image href="${imageDataUri}" x="0" y="0" width="${imgWidth}" height="${imgHeight}"/>
+  <text x="${imgWidth / 2}" y="${nameY}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}" font-weight="700" fill="#1a1a2e" letter-spacing="2">${n}</text>
+</svg>`;
+}
+
+// ============ Original SVG generator (fallback when no template uploaded) ============
 
 const generateCertificateSvg = (name: string, label: string, sublabel: string | undefined, eventDate: string) => {
   const escapeSvg = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -96,25 +171,17 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
       <rect x="64" y="64" width="1620" height="1100" rx="16"/>
     </clipPath>
   </defs>
-
-  <!-- Background layers -->
   <rect width="1748" height="1228" fill="url(#bg)"/>
   <rect width="1748" height="1228" fill="url(#glowCenter)"/>
   <rect width="1748" height="1228" fill="url(#glowTop)"/>
   <rect width="1748" height="1228" fill="url(#glowBottom)"/>
   <rect width="1748" height="1228" fill="url(#dots)"/>
   <rect width="1748" height="1228" fill="url(#filigree)"/>
-
-  <!-- Outer triple border -->
   <rect x="24" y="24" width="1700" height="1180" rx="22" fill="none" stroke="#8f6a24" stroke-opacity="0.15" stroke-width="1"/>
   <rect x="40" y="40" width="1668" height="1148" rx="20" fill="none" stroke="url(#gold)" stroke-opacity="0.4" stroke-width="1.5"/>
   <rect x="56" y="56" width="1636" height="1116" rx="18" fill="none" stroke="url(#gold)" stroke-opacity="0.8" stroke-width="2.5"/>
   <rect x="72" y="72" width="1604" height="1084" rx="14" fill="none" stroke="url(#gold)" stroke-opacity="0.3" stroke-width="1"/>
-
-  <!-- Inner decorative border with dash -->
   <rect x="96" y="96" width="1556" height="1036" rx="10" fill="none" stroke="#d7ab46" stroke-opacity="0.12" stroke-width="1" stroke-dasharray="12,8"/>
-
-  <!-- Corner ornaments - top left -->
   <g opacity="0.7" transform="translate(96,96)">
     <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
     <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
@@ -124,7 +191,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
     <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
-  <!-- Corner ornaments - top right -->
   <g opacity="0.7" transform="translate(1652,96) scale(-1,1)">
     <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
     <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
@@ -134,7 +200,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
     <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
-  <!-- Corner ornaments - bottom left -->
   <g opacity="0.7" transform="translate(96,1132) scale(1,-1)">
     <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
     <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
@@ -144,7 +209,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
     <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
-  <!-- Corner ornaments - bottom right -->
   <g opacity="0.7" transform="translate(1652,1132) scale(-1,-1)">
     <path d="M0 80 L0 0 L80 0" fill="none" stroke="url(#gold)" stroke-width="3"/>
     <path d="M12 65 L12 12 L65 12" fill="none" stroke="url(#gold)" stroke-width="1.5" stroke-opacity="0.4"/>
@@ -154,8 +218,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <path d="M0 0 Q18 40 0 80" fill="none" stroke="#d7ab46" stroke-width="1" stroke-opacity="0.25"/>
     <path d="M25 0 L25 25 L0 25" fill="none" stroke="#d7ab46" stroke-width="0.8" stroke-opacity="0.2"/>
   </g>
-
-  <!-- Top center ornamental flourish -->
   <g opacity="0.6" transform="translate(874,145)">
     <path d="M-160 0 Q-120 -30 -80 0 Q-40 30 0 0 Q40 -30 80 0 Q120 30 160 0" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <path d="M-100 0 Q-50 -18 0 0 Q50 18 100 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.4"/>
@@ -164,8 +226,6 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <circle cx="160" cy="0" r="2.5" fill="#d7ab46"/>
     <path d="M-8 0 L0 -8 L8 0 L0 8 Z" fill="none" stroke="#f3d88d" stroke-width="1" stroke-opacity="0.5"/>
   </g>
-
-  <!-- Bottom center ornamental flourish -->
   <g opacity="0.6" transform="translate(874,1085)">
     <path d="M-160 0 Q-120 30 -80 0 Q-40 -30 0 0 Q40 30 80 0 Q120 -30 160 0" fill="none" stroke="url(#gold)" stroke-width="2"/>
     <path d="M-100 0 Q-50 18 0 0 Q50 -18 100 0" fill="none" stroke="url(#gold)" stroke-width="1.2" stroke-opacity="0.4"/>
@@ -174,63 +234,35 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <circle cx="160" cy="0" r="2.5" fill="#d7ab46"/>
     <path d="M-8 0 L0 -8 L8 0 L0 8 Z" fill="none" stroke="#f3d88d" stroke-width="1" stroke-opacity="0.5"/>
   </g>
-
-  <!-- Side decorative lines -->
   <rect x="115" y="350" width="2" height="528" fill="url(#sideGlow)"/>
   <rect x="1631" y="350" width="2" height="528" fill="url(#sideGlow)"/>
-
-  <!-- Side small diamond accents -->
   <g opacity="0.3">
     <path d="M116 340 L120 334 L124 340 L120 346 Z" fill="#d7ab46"/>
     <path d="M116 888 L120 882 L124 888 L120 894 Z" fill="#d7ab46"/>
     <path d="M1628 340 L1632 334 L1636 340 L1632 346 Z" fill="#d7ab46"/>
     <path d="M1628 888 L1632 882 L1636 888 L1632 894 Z" fill="#d7ab46"/>
   </g>
-
-  <!-- Star/diamond accent top -->
   <g opacity="0.5" transform="translate(874, 200)">
     <path d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z" fill="#f3d88d"/>
     <path d="M0 -10 L2.5 -2.5 L10 0 L2.5 2.5 L0 10 L-2.5 2.5 L-10 0 L-2.5 -2.5 Z" fill="#fcedc4" opacity="0.6"/>
   </g>
-
-  <!-- Certificate of Membership heading -->
   <text x="874" y="268" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#FFFFFF" letter-spacing="12" font-weight="400">CERTIFICATE OF MEMBERSHIP</text>
-
-  <!-- Decorative line under heading -->
   <rect x="524" y="292" width="700" height="2" fill="url(#line)"/>
   <rect x="574" y="298" width="600" height="1" fill="url(#lineFade)" opacity="0.5"/>
-
-  <!-- Small ornament under line -->
   <g opacity="0.5" transform="translate(874,305)">
     <path d="M-6 0 L0 -6 L6 0 L0 6 Z" fill="#d7ab46"/>
   </g>
-
-  <!-- Presented to -->
   <text x="874" y="365" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#FFFFFF" letter-spacing="8" opacity="0.85">PRESENTED TO</text>
-
-  <!-- Recipient name -->
   <text x="874" y="455" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="76" font-weight="700" fill="url(#goldShine)">${n}</text>
-
-  <!-- Decorative line under name -->
   <rect x="474" y="480" width="800" height="2.5" fill="url(#line)"/>
   <rect x="524" y="487" width="700" height="1" fill="url(#lineFade)" opacity="0.4"/>
-
-  <!-- Small diamonds flanking the line -->
   <g opacity="0.6">
     <path d="M454 480 L466 474 L478 480 L466 486 Z" fill="#d7ab46"/>
     <path d="M1270 480 L1282 474 L1294 480 L1282 486 Z" fill="#d7ab46"/>
   </g>
-
-  <!-- Official member text -->
   <text x="874" y="545" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" fill="#FFFFFF" letter-spacing="10" font-weight="400">OFFICIAL MEMBER OF</text>
-
-  <!-- The Elite Circle -->
   <text x="874" y="640" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="84" font-weight="700" fill="url(#gold)" letter-spacing="5">THE ELITE CIRCLE</text>
-
-  <!-- Tagline -->
   <text x="874" y="695" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#FFFFFF" letter-spacing="8" opacity="0.7">ELEGANCE  •  EXCELLENCE  •  IMPACT</text>
-
-  <!-- Decorative separator with ornate center -->
   <g opacity="0.7" transform="translate(874,740)">
     <rect x="-250" y="-1" width="500" height="2" fill="url(#line)"/>
     <circle cx="0" cy="0" r="6" fill="none" stroke="url(#goldHoriz)" stroke-width="1.5"/>
@@ -239,21 +271,12 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
     <circle cx="-260" cy="0" r="2.5" fill="#d7ab46" opacity="0.5"/>
     <circle cx="260" cy="0" r="2.5" fill="#d7ab46" opacity="0.5"/>
   </g>
-
-  <!-- Award/Business label in ornate pill -->
   <rect x="${874 - (l.length * 8 + 90)}" y="770" width="${l.length * 16 + 180}" height="74" rx="37" fill="#080c18" fill-opacity="0.85" stroke="url(#gold)" stroke-opacity="0.6" stroke-width="2"/>
   <rect x="${874 - (l.length * 8 + 85)}" y="775" width="${l.length * 16 + 170}" height="64" rx="32" fill="none" stroke="#d7ab46" stroke-opacity="0.15" stroke-width="1"/>
   <text x="874" y="818" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="url(#gold)" font-weight="700" letter-spacing="4">${l.toUpperCase()}</text>
-
   ${sl ? `<text x="874" y="900" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" fill="#FFFFFF" font-style="italic" opacity="0.9">"${sl}"</text>` : ''}
-
-  <!-- Bottom section -->
   <rect x="624" y="${sl ? 940 : 885}" width="500" height="1.5" fill="url(#line)" opacity="0.6"/>
-
-  <!-- Date -->
   <text x="874" y="${sl ? 985 : 935}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#FFFFFF" letter-spacing="4" opacity="0.85">Issued on ${escapeSvg(eventDate)}</text>
-
-  <!-- Bottom decorative stars -->
   <g opacity="0.4" transform="translate(874, ${sl ? 1025 : 975})">
     <path d="M-40 0 L-36 -4 L-32 0 L-36 4 Z" fill="#d7ab46"/>
     <path d="M0 0 L4 -6 L8 0 L4 6 Z" fill="#fcedc4"/>
@@ -263,9 +286,11 @@ const generateCertificateSvg = (name: string, label: string, sublabel: string | 
   </g>
 </svg>`;
 };
+
 async function svgToPng(svgString: string): Promise<Uint8Array> {
   return await renderSvgToPng(svgString);
 }
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -277,7 +302,7 @@ serve(async (req) => {
       throw new Error('RESEND_API_KEY is not configured');
     }
 
-    const { name, email, awardTitle, teamName, eventDate = 'March 28, 2026', isGroup, businessName, tagline }: CertificateRequest = await req.json();
+    const { name, email, awardTitle, teamName, eventDate = 'March 28, 2026', isGroup, businessName, tagline, certificateTemplateUrl }: CertificateRequest = await req.json();
 
     if (!name || !email) {
       return new Response(
@@ -296,8 +321,18 @@ serve(async (req) => {
       );
     }
 
-    // Generate SVG then convert to PNG attachment
-    const certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
+    let certificateSvg: string;
+
+    if (certificateTemplateUrl) {
+      // Use uploaded template: fetch image, overlay name
+      console.log('Using uploaded certificate template:', certificateTemplateUrl);
+      const { dataUri, width, height } = await fetchImageAsBase64(certificateTemplateUrl);
+      certificateSvg = generateOverlaySvg(dataUri, width, height, name);
+    } else {
+      // Fall back to generated SVG
+      certificateSvg = generateCertificateSvg(name, certLabel, certSublabel, eventDate);
+    }
+
     const pngBytes = await svgToPng(certificateSvg);
 
     let binary = '';

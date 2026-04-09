@@ -7,6 +7,8 @@ interface AppState {
   groups: Group[];
   isAuthenticated: boolean;
   searchQuery: string;
+  certificateTemplateUrl: string | null;
+  setCertificateTemplateUrl: (url: string | null) => void;
   setParticipants: (p: Participant[]) => void;
   addParticipants: (p: Participant[]) => void;
   updateParticipant: (id: string, data: Partial<Participant>) => void;

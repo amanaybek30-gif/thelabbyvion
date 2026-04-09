@@ -5,6 +5,7 @@ import CSVUpload from './CSVUpload';
 import ParticipantTable from './ParticipantTable';
 import AddParticipantForm from './AddParticipantForm';
 import CertificatePreview from './CertificatePreview';
+import CertificateTemplateUpload from './CertificateTemplateUpload';
 import GroupManager from './GroupManager';
 import vionLogo from '@/assets/vion-logo.png';
 import { Button } from '@/components/ui/button';
@@ -58,8 +59,8 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Upload & Add */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Upload, Add & Certificate Template */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="space-y-3">
             <h2 className="text-sm font-display font-semibold text-foreground">Upload Participants</h2>
             <CSVUpload />
@@ -68,6 +69,7 @@ const Dashboard = () => {
             <h2 className="text-sm font-display font-semibold text-foreground">Add Manually</h2>
             <AddParticipantForm />
           </div>
+          <CertificateTemplateUpload />
         </div>
 
         {/* Participant Table */}

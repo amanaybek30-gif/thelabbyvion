@@ -35,6 +35,8 @@ export const useAppStore = create<AppState>()(
       groups: [],
       isAuthenticated: false,
       searchQuery: '',
+      certificateTemplateUrl: null,
+      setCertificateTemplateUrl: (url) => set({ certificateTemplateUrl: url }),
       setParticipants: (participants) => set({ participants }),
       addParticipants: (newP) => {
         set((s) => ({ participants: [...s.participants, ...newP] }));
